@@ -6,7 +6,7 @@
 <title>Tether: let your coding agent use your own browser</title>
 <meta name="description" content="Tether is a browser extension and local MCP host that lets Claude Code, Codex and other agents use the tabs you share, signed in as you. Forms, navigation, devtools, site restyling and userscripts.">
 <meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#141311">
+<meta name="theme-color" content="#0b0b0a">
 <link rel="canonical" href="https://tether.udaysinh.me/">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.png" sizes="32x32">
@@ -21,208 +21,213 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://tether.udaysinh.me/assets/og.png">
+<link rel="preload" href="/assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jakarta.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/site.js" defer></script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Tether","url":"https://tether.udaysinh.me/","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux","description":"A browser extension and local MCP host that lets coding agents use the browser tabs you share.","author":{"@type":"Person","name":"Udaysinh Sapate","url":"https://udaysinh.me"},"publisher":{"@type":"Organization","name":"Kuro Labs","url":"https://kurolabs.in"}}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 100 100"><rect width="100" height="100" rx="26" fill="#1c1b19"/><circle cx="33" cy="67" r="13" fill="none" stroke="#ece8e1" stroke-width="6.5"/><path d="M42.2 57.8 68 32" stroke="#ece8e1" stroke-width="6.5" stroke-linecap="round"/><circle cx="68" cy="32" r="15" fill="#e8a33d"/></symbol>
+  <symbol id="i-gh" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 22v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-6.9a5.4 5.4 0 0 0-1.5-3.7 5 5 0 0 0-.1-3.8s-1.2-.3-3.9 1.5a13.4 13.4 0 0 0-7 0C5.3.8 4.1 1.1 4.1 1.1a5 5 0 0 0-.1 3.8 5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.5V22M9 18c-4.5 2-5-2-7-2"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="3"/><path d="M5 15V6a3 3 0 0 1 3-3h7"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+</svg>
+
 <header class="top">
-  <div class="wrap top-in">
-    <a class="brand" href="/"><img src="/assets/logo.svg" width="26" height="26" alt="">Tether</a>
+  <div class="top-in">
+    <a class="brand" href="/"><svg aria-hidden="true"><use href="#logo"/></svg>Tether</a>
     <nav class="nav" aria-label="Site">
-      <ul>
-        <li><a href="#sharing">Sharing</a></li>
-        <li><a href="#changes">Changing sites</a></li>
-        <li><a href="#devtools">Devtools</a></li>
-        <li><a href="#safety">Safety</a></li>
-        <li class="keep"><a href="#setup">Set up</a></li>
-      </ul>
+      <a href="#demos">Features</a>
+      <a href="#setup">Set up</a>
+      <a href="#safety">Safety</a>
+      <a href="#faq">Questions</a>
     </nav>
+    <span class="grow"></span>
+    <a class="round press" href="https://github.com/udaysinh-git/tether" aria-label="Tether on GitHub"><svg><use href="#i-gh"/></svg></a>
+    <a class="pill-btn amber press" href="#setup">Set it up</a>
   </div>
 </header>
 
 <main id="main">
-  <div class="wrap">
-    <div class="hero">
-      <div>
-        <p class="label"><span class="dot" aria-hidden="true"></span>For Claude Code, Codex and any MCP client</p>
-        <h1>Let your coding agent use your own browser.</h1>
-        <p class="lede">Tether hands an agent the tabs you choose, signed in as you. It reads pages, fills forms, clicks through flows, checks the network log and can restyle a site, while you watch its cursor and can pause it at any moment.</p>
-        <div class="actions">
-          <a class="btn btn-primary" href="#setup">Set it up</a>
-          <a class="btn" href="https://github.com/udaysinh-git/tether"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-3.9a3.4 3.4 0 0 0-.9-2.6c3.1-.3 6.4-1.5 6.4-6.9a5.4 5.4 0 0 0-1.5-3.7 5 5 0 0 0-.1-3.8s-1.2-.3-3.9 1.5a13.4 13.4 0 0 0-7 0C5.3.8 4.1 1.1 4.1 1.1a5 5 0 0 0-.1 3.8 5.4 5.4 0 0 0-1.5 3.7c0 5.4 3.3 6.6 6.4 7a3.4 3.4 0 0 0-.9 2.5V22"/><path d="M9 18c-4.5 2-5-2-7-2"/></svg>GitHub</a>
+  <section class="hero">
+    <canvas id="dots" aria-hidden="true"></canvas>
+    <h1 class="reveal" data-words>Let your coding agent use your own browser</h1>
+    <p class="lede rise" style="--d:.45s">Tether hands <b>Claude Code</b>, <b>Codex</b> and any MCP agent the tabs you choose, <b>signed in as you</b>. It reads pages, fills forms, debugs and restyles sites while you watch its cursor.</p>
+    <div class="agents rise" style="--d:.6s" aria-label="Works with">
+      <span class="on"><i></i>Claude Code</span><span class="on"><i></i>Codex</span><span><i></i>Cursor</span><span><i></i>Gemini CLI</span><span><i></i>Chrome</span><span><i></i>Firefox and Zen</span>
+    </div>
+    <div class="actions rise" style="--d:.72s">
+      <a class="pill-btn amber big press" href="#setup">Set it up</a>
+      <a class="pill-btn big press" href="#demos">Try the demos</a>
+    </div>
+    <p class="note rise" style="--d:.85s">Runs on your machine. Nothing is visible to an agent until you share it.</p>
+  </section>
+
+  <div class="wrap" id="demos">
+    <div class="chips" role="toolbar" aria-label="Filter features">
+      <button class="chip" aria-pressed="true" data-filter="all">All</button>
+      <button class="chip" aria-pressed="false" data-filter="share">Sharing</button>
+      <button class="chip" aria-pressed="false" data-filter="watch">Watching</button>
+      <button class="chip" aria-pressed="false" data-filter="change">Changing sites</button>
+      <button class="chip" aria-pressed="false" data-filter="debug">Debugging</button>
+      <button class="chip" aria-pressed="false" data-filter="learn">Learning</button>
+    </div>
+
+    <div class="grid">
+      <article class="card" data-cat="share">
+        <div class="stage"><div class="mini share" id="share"></div></div>
+        <p class="veil">One click in the popup gives your agent this tab and anything it opens.</p>
+        <div class="cap"><span class="name">Share a tab</span><span class="grow"></span><button class="round press" data-replay="share" aria-label="Replay"><svg><use href="#i-replay"/></svg></button></div>
+      </article>
+
+      <article class="card" data-cat="watch">
+        <div class="stage"><div class="island-wrap"><div class="island" id="island" role="button" tabindex="0" aria-label="Status panel demo, press to step through"></div></div></div>
+        <p class="veil">The panel on the page follows the agent, and asks for you when it needs a human.</p>
+        <div class="cap"><span class="name">Status panel</span><span class="grow"></span><button class="round press" data-replay="island" aria-label="Next state"><svg><use href="#i-replay"/></svg></button></div>
+      </article>
+
+      <article class="card" data-cat="watch">
+        <div class="stage">
+          <div class="desk" id="desk">
+            <h4>Book a demo</h4>
+            <p>We'll reply within a day.</p>
+            <div class="fields"><div class="field" data-f="0"></div><div class="field" data-f="1"></div></div>
+            <div class="send">Send</div>
+          </div>
         </div>
-      </div>
-      <figure class="hero-shot">
-        <img src="/assets/shots/popup-shared.webp" width="360" height="788" alt="The Tether popup with a shared tab: Claude Code's latest action, Pause and Stop sharing, a saved style, scripts and recording switches" fetchpriority="high">
-      </figure>
+        <p class="veil">An amber cursor with the agent's name moves to each control before it acts.</p>
+        <div class="cap"><span class="name">Agent cursor</span><span class="grow"></span><button class="round press" data-replay="cursor" aria-label="Replay"><svg><use href="#i-replay"/></svg></button></div>
+      </article>
+
+      <article class="card wide" data-cat="share">
+        <div class="stage"><div class="hub" id="hub"></div></div>
+        <p class="veil">Every agent on the machine talks to one local host. Point at one to see its line.</p>
+        <div class="cap"><span class="name">One host, every agent</span></div>
+      </article>
+
+      <article class="card" data-cat="share">
+        <div class="stage"><div class="mini prompt" id="prompt"></div></div>
+        <p class="veil">An agent can ask for its own window in your browser. You decide.</p>
+        <div class="cap"><span class="name">Agent asks first</span><span class="grow"></span><button class="round press" data-replay="prompt" aria-label="Replay"><svg><use href="#i-replay"/></svg></button></div>
+      </article>
+
+      <article class="card" data-cat="share watch">
+        <div class="stage">
+          <div class="toggles" id="toggles">
+            <button class="toggle-row" data-k="cursor"><span class="grow"><span class="t">Show the agent's cursor</span><br><span class="s">An amber pointer with its name</span></span><span class="switch on"></span></button>
+            <button class="toggle-row" data-k="ask"><span class="grow"><span class="t">Ask before a new window</span><br><span class="s">A prompt each time</span></span><span class="switch on"></span></button>
+            <button class="toggle-row" data-k="bypass"><span class="grow"><span class="t">Bypass mode</span><br><span class="s">Every tab, until the browser closes</span></span><span class="switch"></span></button>
+          </div>
+        </div>
+        <p class="veil">Your rules live in the popup. Drag or tap the switches.</p>
+        <div class="cap"><span class="name">Your rules</span></div>
+      </article>
+
+      <article class="card" data-cat="debug">
+        <div class="stage"><div class="net" id="net"></div></div>
+        <p class="veil">Requests with headers and bodies, console errors and cookies, from your real session.</p>
+        <div class="cap"><span class="name">Network log</span></div>
+      </article>
+
+      <article class="card" data-cat="learn">
+        <div class="stage"><div class="rec" id="rec"></div></div>
+        <p class="veil">Record a visit so agents learn the pages, fields and paths you use. Secrets stay masked.</p>
+        <div class="cap"><span class="name">Recording</span></div>
+      </article>
+
+      <article class="card wide" data-cat="change">
+        <div class="stage">
+          <div class="compare" id="compare" role="slider" tabindex="0" aria-label="Before and after the agent's style" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+            <div class="pane light"><h5>Invoices</h5><div class="rowx"><span>Acme Supplies</span><span>₹ 42,000</span></div><div class="rowx"><span>Northwind</span><span>₹ 18,450</span></div><div class="rowx"><span>Globex</span><span>₹ 7,900</span></div><div class="rowx"><span>Initech</span><span>₹ 63,120</span></div><span class="label">Before</span></div>
+            <div class="pane dark"><h5>Invoices</h5><div class="rowx"><span>Acme Supplies</span><span class="amt">₹ 42,000</span></div><div class="rowx"><span>Northwind</span><span class="amt">₹ 18,450</span></div><div class="rowx"><span>Globex</span><span class="amt">₹ 7,900</span></div><div class="rowx"><span>Initech</span><span class="amt">₹ 63,120</span></div><span class="label">With the agent's style</span></div>
+            <div class="handle"></div>
+          </div>
+        </div>
+        <p class="veil">Send a screenshot you like. The agent saves a style or userscript that works in Stylus and Tampermonkey too.</p>
+        <div class="cap"><span class="name">Restyle any site</span></div>
+      </article>
+
+      <article class="card" data-cat="learn">
+        <div class="stage"><div class="toasts" id="toasts"></div></div>
+        <p class="veil">Watchers check a page on a schedule with your cookies and tell you when it changes.</p>
+        <div class="cap"><span class="name">Watchers</span><span class="grow"></span><button class="round press" data-replay="toasts" aria-label="Another alert"><svg><use href="#i-bell"/></svg></button></div>
+      </article>
     </div>
   </div>
 
-  <section id="sharing">
+  <section class="block" id="setup">
     <div class="wrap">
-      <div class="intro">
-        <h2>Nothing is visible until you share it</h2>
-        <p>An agent sees a tab only after you click <strong>Share this tab</strong> or approve its request. Tabs a shared page opens come along; tabs you open yourself stay yours.</p>
-      </div>
-      <div class="split">
-        <div>
-          <h3>Its own window</h3>
-          <p>When an agent needs a browser, it asks. You get a prompt with its reason, and on approval it works in a new window of your browser with your logins. Your own tabs keep working and stay private.</p>
-          <h3>The tab you're on</h3>
-          <p>For "help me with this page", the agent asks for your current tab instead, or you share it from the popup.</p>
-          <h3>Every tab, if you allow it</h3>
-          <p>Bypass mode opens up every tab for a task that needs what you already have open. It switches off when you close the browser.</p>
+      <p class="kicker inview"><span class="dot beat"></span>A few minutes, once</p>
+      <h2 class="inview" style="--d:.05s">Set it up</h2>
+      <p class="sub inview" style="--d:.1s">You need Node 20 or newer and a Chromium or Firefox based browser.</p>
+      <div class="steps">
+        <div class="step inview">
+          <span class="n">1</span>
+          <h3>Install the host</h3>
+          <div class="copy"><pre>git clone https://github.com/udaysinh-git/tether.git
+cd tether && npm install && npm run build
+node host/cli.js setup</pre><button class="press" aria-label="Copy"><svg class="cp"><use href="#i-copy"/></svg><svg class="ok"><use href="#i-check"/></svg></button></div>
+          <p><code>setup</code> prints your pairing key and the lines for your agents.</p>
         </div>
-        <figure class="shot"><img src="/assets/shots/prompt.webp" width="800" height="600" alt="Prompt: Codex wants access to all your tabs, with its reason and Not now and Allow buttons" loading="lazy"></figure>
-      </div>
-    </div>
-  </section>
-
-  <section id="watch">
-    <div class="wrap">
-      <div class="split flip">
-        <div>
-          <h2>You can see what it does</h2>
-          <p>The agent has its own cursor, labelled with its name, that moves to each button before it clicks or types. A small panel on the page shows its latest action, with <strong>Pause</strong> and <strong>Stop</strong>.</p>
-          <p>Pause holds every click, keystroke and navigation until you resume. When the agent reaches something only you should do, like a CAPTCHA, a code from your phone or a payment confirmation, it brings the tab forward with a message and waits for you to press <strong>Done</strong>.</p>
-          <p>The panel can be dragged anywhere, or hidden so it only appears when the agent needs you.</p>
-        </div>
-        <div class="shots">
-          <figure class="shot"><img src="/assets/shots/cursor.webp" width="1400" height="840" alt="The agent's amber cursor, labelled Claude Code, resting on a New invoice button" loading="lazy"></figure>
-          <figure class="shot"><img src="/assets/shots/page-pill-ask.webp" width="1000" height="240" alt="Status panel: Claude Code needs you. Please type the 6-digit code from your phone, then press Done." loading="lazy"></figure>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="actions">
-    <div class="wrap">
-      <div class="intro">
-        <h2>Reads the page the way a person would</h2>
-        <p>The agent gets each page as an outline of headings, text and controls, each with a short reference it can click, type into or choose from. Every action returns the updated page, so it knows what happened.</p>
-      </div>
-      <ul class="list cols">
-        <li>Fills and submits forms, including file uploads to hidden inputs</li>
-        <li>Works inside cross-origin iframes such as payment and embedded forms</li>
-        <li>In Chrome, Brave and Edge, clicks and keys arrive as real input</li>
-        <li>Runs scripts even on pages with strict security policies</li>
-        <li>Opens, moves between and closes tabs in its window</li>
-        <li>Takes screenshots and reads canvas-heavy pages when the outline is thin</li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="changes">
-    <div class="wrap">
-      <div class="split">
-        <div>
-          <h2>Ask for changes to any site</h2>
-          <p><strong>Request a change</strong> in the popup takes a note and pasted images: a screenshot of a site you like, a mockup, a sketch. <strong>Pick</strong> lets you click a part of the page and write a note about just that element.</p>
-          <p>The agent previews CSS on the live tab, checks it with a screenshot and saves it as a style that applies on every visit. When CSS isn't enough it writes a userscript. Its reply shows under your request in the popup.</p>
-          <h3>Works with Tampermonkey and Stylus</h3>
-          <p>Every script is a standard <code>.user.js</code> and every style is UserCSS, so they run in Tampermonkey, Violentmonkey and Stylus too. It goes the other way as well: install scripts and styles from Greasy Fork or userstyles.world. Each one has its own switch, and the settings page keeps a gallery with before and after screenshots that you can download, publish as a Gist or delete.</p>
-        </div>
-        <div class="shots">
-          <figure class="shot"><img src="/assets/shots/picker.webp" width="2000" height="1280" alt="Picking an element on a page: the element outlined and a note box with Cancel and Send" loading="lazy"></figure>
-          <figure class="shot narrow"><img src="/assets/shots/popup-composer.webp" width="720" height="1984" alt="The request box in the popup with a description, Add images, Cancel and Send" loading="lazy"></figure>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="learns">
-    <div class="wrap">
-      <div class="intro">
-        <h2>It learns how you use a site</h2>
-        <p><strong>Record</strong> saves what you click, what you fill in, the pages you open and the site's API calls. Passwords, card numbers and one-time codes are always masked, and there is no video.</p>
-        <p>Before working on a site, the agent reads a summary of its pages, the controls you actually use, the fields you fill and your usual paths, plus notes it left itself last time.</p>
-      </div>
-      <h3>Watchers</h3>
-      <p>Ask for "tell me when this drops below 2,000" or "when the results are posted" and the agent sets up a check that runs on a schedule with your cookies. Alerts come as browser notifications and, if you like, on your phone through ntfy.</p>
-    </div>
-  </section>
-
-  <section id="devtools">
-    <div class="wrap">
-      <div class="intro">
-        <h2>Devtools for the agent</h2>
-        <p>Debugging a web app works on the real session, so the agent sees the same bugs you do.</p>
-      </div>
-      <ul class="list cols">
-        <li>Every network request since sharing, with headers and bodies</li>
-        <li>Console output and uncaught errors</li>
-        <li>Cookies, including httpOnly ones</li>
-        <li>JavaScript in the page's own context</li>
-        <li>Images, <code>blob:</code> media, canvases, video frames and HLS or DASH streams saved to disk</li>
-        <li>Downloads the site produces, with their file paths</li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="works-with">
-    <div class="wrap">
-      <div class="cols">
-        <div>
-          <h2>Agents</h2>
-          <p>Claude Code, Codex, Cursor, Gemini CLI and any other client that speaks MCP over stdio. Several agents can share one browser at the same time, and each shows up by name.</p>
-        </div>
-        <div>
-          <h2>Browsers</h2>
-          <p>Chrome, Brave, Edge and other Chromium browsers, plus Firefox, Zen, LibreWolf, Floorp and other Firefox forks. Firefox builds are signed, so they stay installed.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="safety">
-    <div class="wrap">
-      <div class="intro">
-        <h2>Safety and privacy</h2>
-        <p>Everything runs on your machine. Nothing is sent to a Tether server, because there isn't one.</p>
-      </div>
-      <ul class="list">
-        <li>The host listens on 127.0.0.1 only and refuses requests from web pages, including DNS rebinding attempts.</li>
-        <li>Agents and extensions need a pairing key that stays on your machine, and you can replace it at any time.</li>
-        <li>The extension never takes commands from web pages. Its cursor and status panel live in a closed shadow root that sites can't read.</li>
-        <li>Agents are told to ask before paying, sending messages or deleting anything. Treat sharing a tab like handing someone your mouse, and keep an eye on the panel when it matters.</li>
-      </ul>
-    </div>
-  </section>
-
-  <section id="setup">
-    <div class="wrap">
-      <div class="intro">
-        <h2>Set it up</h2>
-        <p>You need Node 20 or newer. The whole setup takes a few minutes.</p>
-      </div>
-      <ol class="steps">
-        <li><strong>Install the host.</strong>
-          <div class="cmd">git clone https://github.com/udaysinh-git/tether.git
-cd tether
-npm install
-npm run build
-node host/cli.js setup</div>
-          <p><code>setup</code> prints your pairing key and the lines for your agents, and registers the bridge Firefox uses.</p>
-        </li>
-        <li><strong>Add it to your agent.</strong> For Claude Code:
-          <div class="cmd">claude mcp add --scope user tether -- node /path/to/tether/host/cli.js</div>
+        <div class="step inview" style="--d:.06s">
+          <span class="n">2</span>
+          <h3>Add it to your agent</h3>
+          <div class="copy"><pre>claude mcp add --scope user tether -- node /path/to/tether/host/cli.js</pre><button class="press" aria-label="Copy"><svg class="cp"><use href="#i-copy"/></svg><svg class="ok"><use href="#i-check"/></svg></button></div>
           <p>Codex and other MCP clients run the same command as a stdio server.</p>
-        </li>
-        <li><strong>Load the extension.</strong> In Chrome, Brave or Edge, open <code>chrome://extensions</code>, turn on Developer mode, choose Load unpacked and pick <code>dist/chrome</code>, then paste the pairing key into the popup. In Firefox and its forks, install the signed <code>.xpi</code>; no key is needed there.</li>
-        <li><strong>Check it.</strong>
-          <div class="cmd">node host/cli.js doctor</div>
-          <p>Then open a page and ask your agent to do something in the browser.</p>
-        </li>
-      </ol>
-      <p class="note">Tether is in early access and the repository is private for now. If you'd like to try it, ask <a href="https://udaysinh.me">Udaysinh</a> for access.</p>
+        </div>
+        <div class="step inview" style="--d:.12s">
+          <span class="n">3</span>
+          <h3>Load the extension</h3>
+          <p>Chrome, Brave or Edge: open <code>chrome://extensions</code>, turn on Developer mode, load <code>dist/chrome</code> and paste the key. Firefox and Zen: install the signed <code>.xpi</code>, no key needed.</p>
+        </div>
+        <div class="step inview" style="--d:.18s">
+          <span class="n">4</span>
+          <h3>Check it</h3>
+          <div class="copy"><pre>node host/cli.js doctor</pre><button class="press" aria-label="Copy"><svg class="cp"><use href="#i-copy"/></svg><svg class="ok"><use href="#i-check"/></svg></button></div>
+          <p>Then ask your agent to do something in the browser.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="safety">
+    <div class="wrap">
+      <p class="kicker inview"><span class="dot"></span>Safety and privacy</p>
+      <h2 class="inview" style="--d:.05s">Everything stays on your machine</h2>
+      <div class="facts">
+        <div class="fact inview"><h3>Local only</h3><p>The host listens on 127.0.0.1 and refuses requests from web pages, DNS rebinding included. There is no Tether server.</p></div>
+        <div class="fact inview" style="--d:.06s"><h3>Paired</h3><p>Agents and extensions need a key that never leaves your machine, and you can replace it any time.</p></div>
+        <div class="fact inview" style="--d:.12s"><h3>Invisible to sites</h3><p>The cursor and status panel live in a closed shadow root, and the extension never takes commands from pages.</p></div>
+        <div class="fact inview" style="--d:.18s"><h3>You stay in charge</h3><p>Pause holds every click and keystroke. Agents are told to ask before paying, sending messages or deleting anything.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="faq">
+    <div class="wrap">
+      <h2 class="inview">Questions</h2>
+      <div class="faq">
+        <div class="q"><button aria-expanded="false"><span>Why not Playwright or a headless browser?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Those start a fresh browser with no logins. Tether uses the one you already have, with your sessions, extensions and cookies, so the agent can work in your ERP, your dashboards or your inbox without anyone sharing a password.</p></div></div></div>
+        <div class="q"><button aria-expanded="false"><span>Can it see my other tabs?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>No. It sees tabs you share, tabs those pages open, and tabs in a window it opened with your approval. Bypass mode opens up every tab, only when you allow it, and turns off when the browser closes.</p></div></div></div>
+        <div class="q"><button aria-expanded="false"><span>Which browsers work?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Chrome, Brave, Edge and other Chromium browsers, and Firefox, Zen, LibreWolf, Floorp and Waterfox. In Chromium, clicks and keys arrive as real input through the debugger.</p></div></div></div>
+        <div class="q"><button aria-expanded="false"><span>Do the styles and scripts work without Tether?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Yes. Styles are UserCSS and scripts are standard userscripts, so they install in Stylus, Tampermonkey and Violentmonkey, and you can publish them as a Gist from the settings page.</p></div></div></div>
+        <div class="q"><button aria-expanded="false"><span>How do I get it?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Tether is in early access and the repository is private for now. Ask <a href="https://udaysinh.me">Udaysinh</a> for access.</p></div></div></div>
+      </div>
     </div>
   </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <span>Tether, made by <a href="https://udaysinh.me">Udaysinh Sapate</a> at <a href="https://kurolabs.in">Kuro Labs</a>.</span>
+    <a class="brand" href="/"><svg aria-hidden="true"><use href="#logo"/></svg>Tether</a>
+    <span>Made by <a href="https://udaysinh.me">Udaysinh Sapate</a> at <a href="https://kurolabs.in">Kuro Labs</a>. Motion inspired by <a href="https://bencho.dev">Bencho</a>.</span>
+    <span class="grow"></span>
     <a href="https://github.com/udaysinh-git/tether">GitHub</a>
   </div>
 </footer>
