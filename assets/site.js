@@ -119,18 +119,6 @@
     });
   })();
 
-  // ------------------------------------------------------------ edge light
-  for (const card of $$(".card")) {
-    card.addEventListener("pointermove", (e) => {
-      const r = card.getBoundingClientRect();
-      const x = e.clientX - r.left - r.width / 2, y = e.clientY - r.top - r.height / 2;
-      const near = Math.max(Math.abs(x) / (r.width / 2), Math.abs(y) / (r.height / 2));
-      card.style.setProperty("--a", `${(Math.atan2(y, x) * 180) / Math.PI + 90}deg`);
-      card.style.setProperty("--glow", String(Math.max(0, (near - 0.55) / 0.45)));
-    });
-    card.addEventListener("pointerleave", () => card.style.setProperty("--glow", "0"));
-  }
-
   const demos = {};
   // The demos only exist on the home page.
   if ($("#demos")) {
@@ -475,6 +463,268 @@
     show();
   })();
 
+  // ------------------------------------------------------------ setup player
+  // Jelly tabs with a sliding pill; the active tab fills like a segment timer
+  // and the player moves on by itself until you pick a step. Each step is a
+  // small live scene: a terminal, an agent picker, a popup pairing itself,
+  // and a doctor checklist that ticks through.
+  (() => {
+    const player = $("#player");
+    if (!player) return;
+    const stage = $("#pstage");
+    const tabs = $$('[role="tab"]', player);
+    const jelly = $(".jelly", player);
+    const STEP_MS = 9000;
+    let step = 0, auto = true, run = 0, timer = 0;
+
+    function moveJelly(prevIdx) {
+      const t = tabs[step], r = t.getBoundingClientRect(), pr = t.parentElement.getBoundingClientRect();
+      const from = jelly.getBoundingClientRect();
+      jelly.style.width = `${r.width}px`;
+      jelly.style.transform = `translateX(${r.left - pr.left - 6}px)`;
+      // Stretch toward the move, then settle: the jelly.
+      if (!reduce && prevIdx != null && prevIdx !== step) jelly.animate([{ scale: "1 1" }, { scale: "1.08 0.9", offset: 0.35 }, { scale: "0.98 1.03", offset: 0.7 }, { scale: "1 1" }], { duration: 520, easing: "ease-out" });
+      void from;
+    }
+
+    const CMDS = {
+      "Claude Code": { file: "Terminal", lines: ["claude mcp add --scope user tether -- node /path/to/tether/host/cli.js"] },
+      Codex: { file: "~/.codex/config.toml", lines: ["[mcp_servers.tether]", "command = 'node'", "args = ['/path/to/tether/host/cli.js']"] },
+      Cursor: { file: ".cursor/mcp.json", lines: ['{ "mcpServers": { "tether": {', '  "command": "node",', '  "args": ["/path/to/tether/host/cli.js"] } } }'] },
+      "Gemini CLI": { file: "~/.gemini/settings.json", lines: ['{ "mcpServers": { "tether": {', '  "command": "node",', '  "args": ["/path/to/tether/host/cli.js"] } } }'] },
+    };
+    let agent = "Claude Code", browser = "Chrome";
+
+    const copyBtn = `<button class="pcopy press" aria-label="Copy"><svg class="cp"><use href="#i-copy"/></svg><svg class="ok"><use href="#i-check"/></svg></button>`;
+
+    async function typeLines(box, lines, alive, { out = [] } = {}) {
+      box.innerHTML = "";
+      for (const line of lines) {
+        const row = document.createElement("div");
+        row.className = "tl";
+        row.innerHTML = `<span class="pr">›</span><span class="tx"></span><span class="caret"></span>`;
+        box.appendChild(row);
+        const tx = $(".tx", row);
+        for (let i = 1; i <= line.length && alive(); i++) { tx.textContent = line.slice(0, i); await sleep(i % 3 ? 16 : 28); }
+        tx.textContent = line;
+        $(".caret", row).remove();
+        await sleep(260);
+      }
+      for (const [cls, text] of out) {
+        if (!alive()) return;
+        const row = document.createElement("div");
+        row.className = `tl out ${cls}`;
+        row.innerHTML = text;
+        box.appendChild(row);
+        await sleep(380);
+      }
+    }
+
+    const scenes = [
+      // 1 · install
+      (alive) => {
+        stage.innerHTML = `<div class="scene sc-term"><div class="term"><div class="tbar"><span>Terminal</span>${copyBtn}</div><div class="tbody" id="tb"></div></div><p class="pnote"><b>setup</b> prints your pairing key and the lines for your agents, and registers the bridge Firefox uses.</p></div>`;
+        $(".pcopy", stage).dataset.copy = "git clone https://github.com/udaysinh-git/tether.git\ncd tether && npm install && npm run build\nnode host/cli.js setup";
+        typeLines($("#tb"), ["git clone https://github.com/udaysinh-git/tether.git", "cd tether && npm install && npm run build", "node host/cli.js setup"], alive, {
+          out: [["ok", "built dist/chrome and dist/firefox"], ["ok", "Firefox bridge registered"], ["key", 'Pairing key <span class="k">k7qm-3vxa-p9dw-r2tn</span>']],
+        });
+      },
+      // 2 · agent
+      () => {
+        const draw = (first) => {
+          const c = CMDS[agent];
+          const box = $(".cfg", stage);
+          box.innerHTML = `<div class="tbar"><span>${esc(c.file)}</span>${copyBtn}</div><div class="tbody">${c.lines.map((l) => `<div class="tl"><span class="tx">${esc(l)}</span></div>`).join("")}</div>`;
+          $(".pcopy", box).dataset.copy = c.lines.join("\n");
+          if (!first && !reduce) $(".tbody", box).animate([{ opacity: 0, transform: "translateY(8px)", filter: "blur(5px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], { duration: 420, easing: "cubic-bezier(.22,1,.36,1)" });
+        };
+        stage.innerHTML = `<div class="scene sc-agent"><div class="seg" role="radiogroup" aria-label="Agent">${Object.keys(CMDS).map((a) => `<button role="radio" aria-checked="${a === agent}" class="press">${esc(a)}</button>`).join("")}</div><div class="term cfg"></div><p class="pnote">Any other MCP client runs the same command as a stdio server.</p></div>`;
+        draw(true);
+        for (const b of $$(".seg button", stage)) b.addEventListener("click", () => {
+          agent = b.textContent; auto = false; sound("tick", { pitch: 1.3 });
+          for (const x of $$(".seg button", stage)) x.setAttribute("aria-checked", String(x === b));
+          draw();
+        });
+      },
+      // 3 · extension
+      (alive) => {
+        const draw = async () => {
+          const box = $(".popup", stage);
+          if (browser === "Chrome") {
+            box.innerHTML = `<div class="ph"><span class="pmark"></span><b>Tether</b><span class="pst"><span class="dot grey"></span>Not paired</span></div><div class="pcard"><div class="t">Pair with your agent</div><div class="s">Paste the key that setup printed.</div><div class="prow"><span class="pin"></span><span class="btn amber">Pair</span></div></div>`;
+            const pin = $(".pin", box);
+            await sleep(500);
+            const key = "k7qm-3vxa-p9dw-r2tn";
+            for (let i = 1; i <= key.length && alive(); i++) { pin.textContent = key.slice(0, i); await sleep(45); }
+            if (!alive()) return;
+            await sleep(350);
+            $(".prow .btn", box).classList.add("down"); await sleep(140); $(".prow .btn", box).classList.remove("down");
+            await sleep(120);
+          }
+          if (!alive()) return;
+          morph(box, () => {
+            box.innerHTML = `<div class="ph"><span class="pmark"></span><b>Tether</b><span class="pst"><span class="dot beat"></span>Ready</span></div><div class="pcard"><div class="t">${browser === "Chrome" ? "Paired" : "Signed add-on installed"}</div><div class="s">${browser === "Chrome" ? "Share a tab, or let your agent ask for one." : "No key needed. The bridge supplies it."}</div><span class="btn amber full">Share this tab</span></div>`;
+          });
+        };
+        stage.innerHTML = `<div class="scene sc-ext"><div class="seg" role="radiogroup" aria-label="Browser">${["Chrome", "Firefox"].map((b) => `<button role="radio" aria-checked="${b === browser}" class="press">${b === "Chrome" ? "Chrome, Brave, Edge" : "Firefox, Zen"}</button>`).join("")}</div><div class="popup"></div><p class="pnote">${browser === "Chrome" ? "Open chrome://extensions, turn on Developer mode, load dist/chrome." : "Install the signed .xpi from Add-ons, then Install Add-on From File."}</p></div>`;
+        for (const b of $$(".seg button", stage)) b.addEventListener("click", () => {
+          browser = b.textContent.startsWith("Chrome") ? "Chrome" : "Firefox"; auto = false; sound("tick", { pitch: 1.3 });
+          go(2, true);
+        });
+        draw();
+      },
+      // 4 · doctor
+      async (alive) => {
+        const checks = ["Node 22 found", "Host listening on 127.0.0.1:47821", "Pairing key in ~/.tether/config.json", "Claude Code has Tether", "Chrome extension connected", "Firefox bridge registered"];
+        stage.innerHTML = `<div class="scene sc-doc"><div class="term"><div class="tbar"><span>Terminal</span>${copyBtn}</div><div class="tbody"><div class="tl"><span class="pr">›</span><span class="tx">node host/cli.js doctor</span></div><div class="checks"></div></div></div><p class="pnote done-note">Then ask your agent to do something in the browser.</p></div>`;
+        $(".pcopy", stage).dataset.copy = "node host/cli.js doctor";
+        const list = $(".checks", stage);
+        for (const c of checks) {
+          if (!alive()) return;
+          const row = document.createElement("div");
+          row.className = "chk";
+          row.innerHTML = `<span class="tick"><svg viewBox="0 0 24 24"><path d="m6 12.5 4 4L18 8.5"/></svg></span><span>${esc(c)}</span>`;
+          list.appendChild(row);
+          await sleep(520);
+        }
+        if (!alive()) return;
+        const all = document.createElement("div");
+        all.className = "chk all";
+        all.innerHTML = `<span class="dot beat"></span><b>All set.</b>`;
+        list.appendChild(all);
+      },
+    ];
+
+    function go(i, keep) {
+      const prev = step;
+      step = i;
+      run++;
+      const my = run;
+      const alive = () => my === run;
+      for (const [k, t] of tabs.entries()) {
+        t.setAttribute("aria-selected", String(k === step));
+        const f = $(".fill", t);
+        f.getAnimations().forEach((a) => a.cancel());
+        f.style.transform = k < step && auto ? "scaleX(1)" : "scaleX(0)";
+      }
+      moveJelly(prev);
+      morph(stage, () => scenes[step](alive));
+      if (!reduce) stage.firstElementChild?.animate([{ opacity: 0, filter: "blur(6px)", transform: "translateY(6px)" }, { opacity: 1, filter: "blur(0)", transform: "none" }], { duration: 460, easing: "cubic-bezier(.22,1,.36,1)" });
+      clearTimeout(timer);
+      if (auto && !keep) {
+        $(".fill", tabs[step]).animate([{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }], { duration: STEP_MS, easing: "linear", fill: "forwards" });
+        timer = setTimeout(() => { if (auto) go((step + 1) % tabs.length); }, STEP_MS);
+      }
+    }
+
+    for (const [k, t] of tabs.entries()) t.addEventListener("click", () => { auto = false; sound("tick", { pitch: 1.2 }); go(k); });
+    player.addEventListener("pointerenter", () => { if (auto) { clearTimeout(timer); $(".fill", tabs[step]).getAnimations().forEach((a) => a.pause()); } });
+    player.addEventListener("pointerleave", () => {
+      if (!auto) return;
+      const a = $(".fill", tabs[step]).getAnimations()[0];
+      if (!a) return;
+      a.play();
+      timer = setTimeout(() => { if (auto) go((step + 1) % tabs.length); }, Math.max(0, STEP_MS - (a.currentTime || 0)));
+    });
+    stage.addEventListener("click", async (e) => {
+      const b = e.target.closest(".pcopy");
+      if (!b) return;
+      try { await navigator.clipboard.writeText(b.dataset.copy || ""); } catch {}
+      b.classList.add("done"); sound("plop");
+      setTimeout(() => b.classList.remove("done"), 1600);
+    });
+    addEventListener("resize", () => moveJelly());
+    let started = false;
+    new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) { started = true; go(0); } }, { threshold: 0.3 }).observe(player);
+    stage.innerHTML = '<div class="scene"></div>';
+    requestAnimationFrame(() => moveJelly());
+  })();
+
+  // ------------------------------------------------------------ safety accordion
+  // After Bencho's image accordion: the pane you point at springs open.
+  (() => {
+    const acc = $("#acc");
+    if (!acc) return;
+    const panes = $$(".pane", acc);
+    const open = (p) => { if (p.classList.contains("open")) return; for (const x of panes) { x.classList.toggle("open", x === p); x.setAttribute("aria-expanded", String(x === p)); } sound("wisp", { volume: 0.6 }); };
+    for (const p of panes) {
+      p.setAttribute("aria-expanded", String(p.classList.contains("open")));
+      p.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") open(p); });
+      p.addEventListener("click", () => open(p));
+      p.addEventListener("focus", () => open(p));
+    }
+  })();
+
+  // ------------------------------------------------------------ questions
+  // A list on the left with a sliding highlight; on the right the answer and
+  // a small live picture of it. Answers come from the hidden FAQ list, which
+  // also stays in the page for search engines.
+  (() => {
+    const qa = $("#qa");
+    if (!qa) return;
+    const list = $("#qlist"), panel = $("#qpanel"), jelly = $(".qjelly", list);
+    const data = $$("#faqData dt").map((dt) => ({ q: dt.textContent.trim(), a: dt.nextElementSibling.innerHTML.trim() }));
+    const lock = '<svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+    const tick = '<span class="tick"><svg viewBox="0 0 24 24"><path d="m6 12.5 4 4L18 8.5"/></svg></span>';
+    let votes = 0, voted = false;
+
+    // One picture per question, in the same order as the FAQ.
+    const PICS = [
+      () => `<div class="qv two">
+          <div class="qwin dim"><div class="qbar"><i></i><span>Headless browser</span></div><div class="qbody"><b>Sign in</b><span class="qin"></span><span class="qin"></span><span class="qbtn">Continue</span></div></div>
+          <div class="qwin"><div class="qbar"><i class="on"></i><span>Your browser</span></div><div class="qbody"><div class="qme"><span class="qav">U</span><span><b>Invoices</b><br><small>Signed in as you</small></span></div><span class="qrow"></span><span class="qrow s"></span><span class="qrow"></span></div></div>
+        </div>`,
+      () => `<div class="qv tabs">${["Inbox", "Invoices", "Bank", "Docs", "Chat"].map((t, i) => `<span class="qtab ${i === 1 ? "on" : ""}" style="--i:${i}">${i === 1 ? '<span class="dot"></span>' : lock}${t}</span>`).join("")}<p class="qcap">Only the tab you share is visible to the agent.</p></div>`,
+      () => `<div class="qv chips">${["Chrome", "Brave", "Edge", "Firefox", "Zen", "LibreWolf", "Floorp", "Waterfox"].map((b, i) => `<span class="qchip" style="--i:${i}">${tick}${b}</span>`).join("")}</div>`,
+      () => `<div class="qv files">${[["dark-dashboard.user.css", "Stylus"], ["fill-timesheet.user.js", "Tampermonkey"], ["hide-banners.user.js", "Violentmonkey"]].map(([f, m], i) => `<div class="qfile" style="--i:${i}"><span class="fn">${f}</span><span class="arrow"></span><span class="mgr">${m}</span></div>`).join("")}</div>`,
+      () => `<div class="qv flow"><span class="qnode">Claude Code</span><span class="qline"><i></i></span><span class="qnode core">Tether host</span><span class="qline"><i></i></span><span class="qnode">Your browser</span></div>`,
+      () => `<div class="qv vote"><button class="qup press" type="button" aria-pressed="${voted}"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span class="qcount">${votes}</span></button><div class="qidea"><b>Your idea goes here</b><small>The most upvoted ideas in the Discord get built first</small></div></div>`,
+      () => `<div class="qv ticket"><div class="qticket"><span class="tk-l"><small>Early access</small><b>Tether</b><span>Ask in the Discord</span></span><span class="tk-r"><a class="pill-btn gold press" href="https://discord.gg/DZNXsCySDD" rel="noopener">Join</a></span></div></div>`,
+    ];
+
+    list.insertAdjacentHTML("beforeend", data.map((d, i) => `<button role="tab" aria-selected="${i === 0}" class="qitem"><span class="qn">${String(i + 1).padStart(2, "0")}</span><span>${esc(d.q)}</span></button>`).join(""));
+    const items = $$(".qitem", list);
+    let cur = -1;
+
+    function place() {
+      const b = items[cur];
+      jelly.style.height = `${b.offsetHeight}px`;
+      jelly.style.transform = `translateY(${b.offsetTop}px)`;
+    }
+    function show(i) {
+      if (i === cur) return;
+      const prev = cur;
+      cur = i;
+      items.forEach((b, k) => b.setAttribute("aria-selected", String(k === i)));
+      place();
+      if (!reduce && prev >= 0) jelly.animate([{ scale: "1 1" }, { scale: "0.97 1.08", offset: 0.4 }, { scale: "1 1" }], { duration: 480, easing: "ease-out" });
+      panel.innerHTML = `<div class="qans"><p class="qq">${esc(data[i].q)}</p><p class="qa-text">${data[i].a}</p></div>${PICS[i] ? PICS[i]() : ""}`;
+      if (!reduce) panel.animate([{ opacity: 0, transform: "translateY(8px)", filter: "blur(6px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], { duration: 460, easing: "cubic-bezier(.22,1,.36,1)" });
+      const up = $(".qup", panel);
+      if (up) up.addEventListener("click", () => {
+        voted = !voted; votes += voted ? 1 : -1;
+        up.setAttribute("aria-pressed", String(voted));
+        const c = $(".qcount", up);
+        c.textContent = votes;
+        sound(voted ? "landed" : "hush", { volume: 0.7 });
+        if (!reduce) c.animate([{ transform: `translateY(${voted ? 10 : -10}px)`, opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 380, easing: "cubic-bezier(.22,1,.36,1)" });
+      });
+    }
+    items.forEach((b, i) => {
+      b.addEventListener("click", () => { if (i !== cur) sound("tick", { pitch: 1.3, volume: 0.8 }); show(i); });
+      b.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") show(i); });
+    });
+    list.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+      e.preventDefault();
+      const n = (cur + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+      items[n].focus(); show(n);
+    });
+    addEventListener("resize", place);
+    show(0);
+    document.fonts?.ready.then(place);
+  })();
+
   // ------------------------------------------------------------ copy fields
   for (const b of $$(".copy button")) {
     b.addEventListener("click", async () => {
@@ -501,11 +751,15 @@
     }
   })();
 
+  // back to top
+  $("#totop")?.addEventListener("click", () => { sound("whisk", { pitch: 1.4 }); scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" }); });
+
   // ------------------------------------------------------------ no copying
   // Selection is off in CSS; this also stops copy, cut, drag and the context
   // menu. The Copy buttons write to the clipboard directly, so they still work.
   for (const ev of ["copy", "cut", "dragstart", "contextmenu", "selectstart"]) document.addEventListener(ev, (e) => e.preventDefault());
   document.addEventListener("keydown", (e) => {
+    if (e.target.closest?.("input")) return;
     if ((e.ctrlKey || e.metaKey) && ["c", "x", "a", "s", "u"].includes(e.key.toLowerCase())) e.preventDefault();
   });
 

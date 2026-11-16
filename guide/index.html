@@ -22,6 +22,7 @@
 <link rel="preload" href="/assets/fonts/jakarta.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/sounds.js" defer></script>
+<script src="/assets/bg.js" defer></script>
 <script src="/assets/site.js" defer></script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "HowTo", "name": "How to let Claude Code or Codex use your real browser", "description": "Connect an AI coding agent to your everyday browser with Tether, a browser MCP server and extension.", "totalTime": "PT10M", "step": [{"@type": "HowToStep", "name": "Install the host", "text": "Clone the repository, run npm install and npm run build, then node host/cli.js setup."}, {"@type": "HowToStep", "name": "Add Tether to your agent", "text": "claude mcp add --scope user tether -- node /path/to/tether/host/cli.js"}, {"@type": "HowToStep", "name": "Load the extension", "text": "Load dist/chrome in Chrome, Brave or Edge and paste the key, or install the signed add-on in Firefox or Zen."}, {"@type": "HowToStep", "name": "Check it", "text": "Run node host/cli.js doctor."}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Tether", "item": "https://tether.udaysinh.me/"}, {"@type": "ListItem", "position": 2, "name": "Guide", "item": "https://tether.udaysinh.me/guide/"}]}]}</script>
 </head>
@@ -124,14 +125,25 @@
   </article>
 </main>
 
-<footer>
+<footer class="foot">
   <div class="wrap">
-    <a class="brand" href="/"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#2d2d2d"/><g fill="none" stroke="#fffbf0" stroke-width="3" stroke-linecap="round"><path d="M12.5 6.5V19.5a5 5 0 0 0 5 5h1.5"/><path class="bar" d="M8 12.5h10"/></g><circle class="knot" cx="23" cy="12.5" r="2.6" fill="#d4af37"/></svg>Tether</a>
-    <span>Made by <a href="https://udaysinh.me">Udaysinh Sapate</a> at <a href="https://kurolabs.in">Kuro Labs</a>. Motion inspired by <a href="https://bencho.dev">Bencho</a>.</span>
-    <span class="grow"></span>
-    <a href="/guide/">Guide</a>
-    <a href="https://discord.gg/DZNXsCySDD" rel="noopener">Discord</a>
-    <a href="https://github.com/udaysinh-git/tether">GitHub</a>
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="/"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#2d2d2d"/><g fill="none" stroke="#fffbf0" stroke-width="3" stroke-linecap="round"><path d="M12.5 6.5V19.5a5 5 0 0 0 5 5h1.5"/><path class="bar" d="M8 12.5h10"/></g><circle class="knot" cx="23" cy="12.5" r="2.6" fill="#d4af37"/></svg>Tether</a>
+        <p>Your agent works in your browser, one tab at a time, while you watch.</p>
+        <p class="foot-status"><span class="dot beat"></span>Everything runs on your machine</p>
+      </div>
+      <nav class="foot-cols" aria-label="Footer">
+        <div><h3>Product</h3><a href="/#demos">Features</a><a href="/#setup">Set up</a><a href="/guide/">Guide</a><a href="/#safety">Safety</a><a href="/#faq">Questions</a></div>
+        <div><h3>Community</h3><a href="https://discord.gg/DZNXsCySDD" rel="noopener">Discord</a><a href="https://discord.gg/DZNXsCySDD" rel="noopener">Share an idea</a><a href="https://github.com/udaysinh-git/tether">GitHub</a></div>
+        <div><h3>Made by</h3><a href="https://udaysinh.me">Udaysinh Sapate</a><a href="https://kurolabs.in">Kuro Labs</a></div>
+      </nav>
+    </div>
+    <div class="foot-word" aria-hidden="true">Tether</div>
+    <div class="foot-bottom">
+      <span>© 2026 Kuro Labs</span>
+      <button class="round press" type="button" id="totop" aria-label="Back to top"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
   </div>
 </footer>
 </body>

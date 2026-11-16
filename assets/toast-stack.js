@@ -23,7 +23,7 @@
       position: absolute; left: 0; right: 0; bottom: 0; height: ${H}px; box-sizing: border-box;
       display: flex; align-items: center; gap: 12px; padding: 0 10px 0 14px;
       border-radius: 20px; background: #2d2d2d;
-      box-shadow: 0 0 0 1px rgb(255 251 240 / .07), 0 12px 30px rgb(0 0 0 / .35);
+      box-shadow: 0 0 0 1px rgb(255 251 240 / .08);
       transform-origin: 50% 0;
       transition: transform .52s ${SPRING}, opacity .3s ease, background-color .22s ease;
     }
