@@ -131,8 +131,10 @@
     card.addEventListener("pointerleave", () => card.style.setProperty("--glow", "0"));
   }
 
-  // ------------------------------------------------------------ 1 · share
   const demos = {};
+  // The demos only exist on the home page.
+  if ($("#demos")) {
+  // ------------------------------------------------------------ 1 · share
   (() => {
     const el = $("#share");
     const page = `<div class="page"><span class="fav">L</span><div><div class="t">Quarterly invoices</div><div class="s">ledgerly.app</div></div></div>`;
@@ -459,6 +461,8 @@
     whenVisible(box, () => { const t = setInterval(() => { if (!box.matches(":hover")) push(); }, 3200); return { stop() { clearInterval(t); } }; });
   })();
 
+  }
+
   // replay buttons
   for (const b of $$("[data-replay]")) b.addEventListener("click", () => { if (b.dataset.replay !== "toasts") sound("tick", { pitch: 1.2 }); demos[b.dataset.replay]?.(); });
 
@@ -484,6 +488,7 @@
   // ------------------------------------------------------------ FAQ frames
   (() => {
     const faq = $(".faq");
+    if (!faq) return;
     for (const q of $$(".q", faq)) {
       $("button", q).addEventListener("click", () => {
         const open = !q.classList.contains("open");

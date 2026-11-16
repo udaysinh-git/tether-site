@@ -330,6 +330,18 @@ h2 { font: 650 clamp(30px, 3.6vw, 42px)/1.12 var(--head); letter-spacing: -0.02e
 .fact h3 { font: 650 17px/1.3 var(--head); letter-spacing: -0.015em; margin-bottom: 6px; display: flex; gap: 10px; align-items: center; }
 .fact p { color: var(--text-2); font-size: 14.5px; }
 
+/* community */
+.join { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 40px; align-items: center; border-radius: 32px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); padding: 44px; position: relative; overflow: hidden; }
+.join::before { content: ""; position: absolute; right: -120px; top: -120px; width: 360px; height: 360px; border-radius: 50%; background: radial-gradient(closest-side, rgb(212 175 55 / 0.14), transparent); pointer-events: none; }
+@media (max-width: 860px) { .join { grid-template-columns: 1fr; padding: 28px; } }
+.join-side { display: grid; gap: 20px; justify-items: start; }
+.ideas { list-style: none; padding: 0; display: grid; gap: 10px; color: var(--text-2); font-size: 14.5px; }
+.ideas li { display: flex; gap: 10px; align-items: center; }
+.ideas li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); flex: none; }
+.pill-btn.gold { background: var(--gold); color: var(--gold-ink); }
+.pill-btn.gold:hover { background: var(--gold-hover); }
+.hero .note a { color: var(--text); text-decoration-color: rgb(212 175 55 / 0.6); text-underline-offset: 3px; }
+
 /* FAQ frames: the open one stays solid, the rest step back */
 .faq { display: grid; gap: 6px; margin-top: 36px; max-width: 760px; }
 .q { border-radius: 22px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); transition: opacity 0.3s var(--out), background-color 0.3s; }
@@ -360,3 +372,27 @@ footer a:hover { color: var(--text); }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .reveal .w, .inview { opacity: 1; transform: none; filter: none; }
 }
+
+/* ---------------------------------------------------------------- guide */
+.article { max-width: 760px; padding-top: 72px; }
+.article h1 { font: 650 clamp(34px, 4.6vw, 50px)/1.1 var(--head); letter-spacing: -0.022em; }
+.article h2 { font-size: clamp(24px, 2.6vw, 30px); margin: 56px 0 12px; }
+.article p { color: var(--text-2); font-size: 16.5px; line-height: 1.7; }
+.article p + p { margin-top: 14px; }
+.article b { color: var(--text); font-weight: 600; }
+.article code { font-family: inherit; background: var(--card-2); padding: 1px 7px; border-radius: 6px; color: var(--text); font-size: 0.93em; }
+.lede-left { margin-top: 20px; font-size: 18px !important; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+.toc a { height: 34px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 999px; background: rgb(255 251 240 / 0.05); color: var(--text-2); text-decoration: none; font-size: 13.5px; font-weight: 500; transition: background-color 0.15s, color 0.15s; }
+.toc a:hover { background: rgb(255 251 240 / 0.09); color: var(--text); }
+.steps-list { padding: 0; list-style: none; counter-reset: s; display: grid; gap: 14px; }
+.steps-list li { counter-increment: s; position: relative; padding: 18px 20px 18px 62px; border-radius: 20px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: var(--text-2); line-height: 1.65; }
+.steps-list li::before { content: counter(s); position: absolute; left: 18px; top: 17px; width: 30px; height: 30px; border-radius: 50%; background: var(--card-2); display: grid; place-items: center; font: 700 13px/1 var(--head); color: var(--gold); }
+.prompts { list-style: none; padding: 0; display: grid; gap: 10px; }
+.prompts li { padding: 14px 18px; border-radius: 18px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: var(--text); font-size: 15.5px; }
+.table { border-radius: 22px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; margin-bottom: 16px; }
+.tr { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 12px; padding: 13px 20px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--text-2); }
+.tr span:first-child { color: var(--text); }
+.tr span:last-child { color: var(--gold); }
+.tr.th { border-top: 0; font-weight: 600; color: var(--text-3); font-size: 13px; }
+.tr.th span:last-child { color: var(--text-3); }

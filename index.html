@@ -3,23 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tether: let your coding agent use your own browser</title>
-<meta name="description" content="Tether is a browser extension and local MCP host that lets Claude Code, Codex and other agents use the tabs you share, signed in as you. Forms, navigation, devtools, site restyling and userscripts.">
+<title>Tether: Claude Code and Codex in your real browser (MCP)</title>
+<meta name="description" content="Tether is a browser MCP server and extension for Chrome and Firefox. Claude Code, Codex and Cursor use the tabs you share, already signed in: fill forms, click through flows, read network logs and restyle sites. A local alternative to a headless browser.">
+<meta name="keywords" content="browser MCP server, Claude Code browser, Codex browser, MCP browser extension, Playwright alternative, AI agent browser automation, logged in browser automation, Chrome MCP, Firefox MCP">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Udaysinh Sapate">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#1a1a1a">
 <link rel="canonical" href="https://tether.udaysinh.me/">
+<link rel="alternate" type="text/plain" href="/llms.txt" title="Tether for language models">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/icon-128.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tether">
 <meta property="og:title" content="Tether: let your coding agent use your own browser">
+<meta property="og:locale" content="en">
+<meta property="og:image:alt" content="Tether: let your coding agent use your own browser">
 <meta property="og:description" content="A browser extension and local MCP host that gives Claude Code, Codex and other agents the tabs you share, signed in as you.">
 <meta property="og:url" content="https://tether.udaysinh.me/">
 <meta property="og:image" content="https://tether.udaysinh.me/assets/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tether: let your coding agent use your own browser">
+<meta name="twitter:description" content="Claude Code, Codex and any MCP agent use the tabs you share, signed in as you. Local, consent first, with a live cursor you can pause.">
 <meta name="twitter:image" content="https://tether.udaysinh.me/assets/og.png">
 <link rel="preload" href="/assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/jakarta.woff2" as="font" type="font/woff2" crossorigin>
@@ -27,7 +35,7 @@
 <script src="/assets/sounds.js" defer></script>
 <script src="/assets/toast-stack.js" defer></script>
 <script src="/assets/site.js" defer></script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Tether","url":"https://tether.udaysinh.me/","applicationCategory":"DeveloperApplication","operatingSystem":"Windows, macOS, Linux","description":"A browser extension and local MCP host that lets coding agents use the browser tabs you share.","author":{"@type":"Person","name":"Udaysinh Sapate","url":"https://udaysinh.me"},"publisher":{"@type":"Organization","name":"Kuro Labs","url":"https://kurolabs.in"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://tether.udaysinh.me/#site", "name": "Tether", "url": "https://tether.udaysinh.me/", "inLanguage": "en", "publisher": {"@id": "https://tether.udaysinh.me/#kurolabs"}}, {"@type": "Organization", "@id": "https://tether.udaysinh.me/#kurolabs", "name": "Kuro Labs", "url": "https://kurolabs.in", "sameAs": ["https://github.com/udaysinh-git", "https://discord.gg/DZNXsCySDD"]}, {"@type": "SoftwareApplication", "@id": "https://tether.udaysinh.me/#app", "name": "Tether", "url": "https://tether.udaysinh.me/", "description": "A browser extension and local MCP server that lets Claude Code, Codex and other AI coding agents use the browser tabs you share, signed in as you.", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Browser automation", "operatingSystem": "Windows, macOS, Linux", "browserRequirements": "Chrome, Brave, Edge, Firefox or Zen", "image": "https://tether.udaysinh.me/assets/og.png", "featureList": ["Share a single tab with an AI agent", "Agent opens its own window after you approve", "Visible agent cursor and pause", "Form filling and navigation", "Network log, console and cookies", "Site restyling with UserCSS", "Userscripts compatible with Tampermonkey", "Recording how you use a site", "Watchers that notify you of changes"], "author": {"@type": "Person", "name": "Udaysinh Sapate", "url": "https://udaysinh.me"}, "publisher": {"@id": "https://tether.udaysinh.me/#kurolabs"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Why not Playwright or a headless browser?", "acceptedAnswer": {"@type": "Answer", "text": "Those start a fresh browser with no logins. Tether uses the one you already have, with your sessions, extensions and cookies, so the agent can work in your ERP, your dashboards or your inbox without anyone sharing a password."}}, {"@type": "Question", "name": "Can it see my other tabs?", "acceptedAnswer": {"@type": "Answer", "text": "No. It sees tabs you share, tabs those pages open, and tabs in a window it opened with your approval. Bypass mode opens up every tab, only when you allow it, and turns off when the browser closes."}}, {"@type": "Question", "name": "Which browsers work?", "acceptedAnswer": {"@type": "Answer", "text": "Chrome, Brave, Edge and other Chromium browsers, and Firefox, Zen, LibreWolf, Floorp and Waterfox. In Chromium, clicks and keys arrive as real input through the debugger."}}, {"@type": "Question", "name": "Do the styles and scripts work without Tether?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Styles are UserCSS and scripts are standard userscripts, so they install in Stylus, Tampermonkey and Violentmonkey, and you can publish them as a Gist from the settings page."}}, {"@type": "Question", "name": "Is Tether an MCP server?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Each agent starts Tether as an ordinary stdio MCP server, and all of them share one local host that talks to your browser extension. Anything that speaks MCP can use it, including Claude Code, Codex, Cursor and Gemini CLI."}}, {"@type": "Question", "name": "Can I suggest a feature?", "acceptedAnswer": {"@type": "Answer", "text": "Please do. Ideas come from the Tether Discord, where you can post what you want your agent to do in your browser and vote on what others asked for."}}, {"@type": "Question", "name": "How do I get it?", "acceptedAnswer": {"@type": "Answer", "text": "Tether is in early access and the repository is private for now. Join the Discord and ask for access, or write to Udaysinh."}}]}]}</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -39,6 +47,7 @@
   <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></symbol>
   <symbol id="i-sound" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="cross" d="m16 9 6 6M22 9l-6 6"/></g></symbol>
+  <symbol id="i-discord" viewBox="0 0 24 24"><path fill="currentColor" d="M19.3 5.3A16.6 16.6 0 0 0 15.2 4l-.5 1a15.4 15.4 0 0 0-5.4 0L8.8 4a16.5 16.5 0 0 0-4.1 1.3C2 9.2 1.3 13 1.6 16.7a16.7 16.7 0 0 0 5 2.5l1.1-1.7c-.6-.2-1.2-.5-1.7-.8l.4-.3a11.9 11.9 0 0 0 11.2 0l.4.3c-.5.3-1.1.6-1.7.8l1.1 1.7a16.6 16.6 0 0 0 5-2.5c.4-4.3-.7-8-3.1-11.4ZM8.7 14.5c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm6.6 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/></symbol>
   <symbol id="i-bell" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
 </svg>
 
@@ -50,9 +59,12 @@
       <a href="#setup">Set up</a>
       <a href="#safety">Safety</a>
       <a href="#faq">Questions</a>
+      <a href="/guide/">Guide</a>
+      <a href="#community">Community</a>
     </nav>
     <span class="grow"></span>
     <button class="round press" id="mute" type="button" aria-label="Mute sounds" aria-pressed="false"><svg><use href="#i-sound"/></svg></button>
+    <a class="round press" href="https://discord.gg/DZNXsCySDD" aria-label="Join the Tether Discord" rel="noopener"><svg><use href="#i-discord"/></svg></a>
     <a class="round press" href="https://github.com/udaysinh-git/tether" aria-label="Tether on GitHub"><svg><use href="#i-gh"/></svg></a>
     <a class="pill-btn amber press" href="#setup">Set it up</a>
   </div>
@@ -70,7 +82,7 @@
       <a class="pill-btn amber big press" href="#setup">Set it up</a>
       <a class="pill-btn big press" href="#demos">Try the demos</a>
     </div>
-    <p class="note rise" style="--d:.85s">Runs on your machine. Nothing is visible to an agent until you share it.</p>
+    <p class="note rise" style="--d:.85s">Runs on your machine. Nothing is visible to an agent until you share it. <a href="https://discord.gg/DZNXsCySDD" rel="noopener">Join the Discord</a> to shape what comes next.</p>
   </section>
 
   <div class="wrap" id="demos">
@@ -213,6 +225,26 @@ node host/cli.js setup</pre><button class="press" aria-label="Copy"><svg class="
     </div>
   </section>
 
+  <section class="block" id="community">
+    <div class="wrap">
+      <div class="join inview">
+        <div>
+          <p class="kicker"><span class="dot beat"></span>Community</p>
+          <h2>Build Tether with us</h2>
+          <p class="sub">Tether is young, and the best ideas so far came from people using it on their own sites. Join the Discord to get early builds, show what your agent did with your browser, report what broke, and suggest the next feature. We pick what to build from there.</p>
+        </div>
+        <div class="join-side">
+          <a class="pill-btn gold big press" href="https://discord.gg/DZNXsCySDD" rel="noopener"><svg width="18" height="18"><use href="#i-discord"/></svg>Join the Discord</a>
+          <ul class="ideas">
+            <li>Share a workflow your agent runs in your browser</li>
+            <li>Vote on and suggest new tools</li>
+            <li>Get signed builds before anyone else</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="block" id="faq">
     <div class="wrap">
       <h2 class="inview">Questions</h2>
@@ -221,7 +253,9 @@ node host/cli.js setup</pre><button class="press" aria-label="Copy"><svg class="
         <div class="q"><button aria-expanded="false"><span>Can it see my other tabs?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>No. It sees tabs you share, tabs those pages open, and tabs in a window it opened with your approval. Bypass mode opens up every tab, only when you allow it, and turns off when the browser closes.</p></div></div></div>
         <div class="q"><button aria-expanded="false"><span>Which browsers work?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Chrome, Brave, Edge and other Chromium browsers, and Firefox, Zen, LibreWolf, Floorp and Waterfox. In Chromium, clicks and keys arrive as real input through the debugger.</p></div></div></div>
         <div class="q"><button aria-expanded="false"><span>Do the styles and scripts work without Tether?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Yes. Styles are UserCSS and scripts are standard userscripts, so they install in Stylus, Tampermonkey and Violentmonkey, and you can publish them as a Gist from the settings page.</p></div></div></div>
-        <div class="q"><button aria-expanded="false"><span>How do I get it?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Tether is in early access and the repository is private for now. Ask <a href="https://udaysinh.me">Udaysinh</a> for access.</p></div></div></div>
+        <div class="q"><button aria-expanded="false"><span>Is Tether an MCP server?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Yes. Each agent starts Tether as an ordinary stdio MCP server, and all of them share one local host that talks to your browser extension. Anything that speaks MCP can use it, including Claude Code, Codex, Cursor and Gemini CLI.</p></div></div></div>
+        <div class="q"><button aria-expanded="false"><span>Can I suggest a feature?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Please do. Ideas come from the <a href="https://discord.gg/DZNXsCySDD" rel="noopener">Tether Discord</a>, where you can post what you want your agent to do in your browser and vote on what others asked for.</p></div></div></div>
+        <div class="q"><button aria-expanded="false"><span>How do I get it?</span><svg><use href="#i-chev"/></svg></button><div class="a"><div><p>Tether is in early access and the repository is private for now. Join the <a href="https://discord.gg/DZNXsCySDD" rel="noopener">Discord</a> and ask for access, or write to <a href="https://udaysinh.me">Udaysinh</a>.</p></div></div></div>
       </div>
     </div>
   </section>
@@ -232,6 +266,8 @@ node host/cli.js setup</pre><button class="press" aria-label="Copy"><svg class="
     <a class="brand" href="/"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#2d2d2d"/><g fill="none" stroke="#fffbf0" stroke-width="3" stroke-linecap="round"><path d="M12.5 6.5V19.5a5 5 0 0 0 5 5h1.5"/><path class="bar" d="M8 12.5h10"/></g><circle class="knot" cx="23" cy="12.5" r="2.6" fill="#d4af37"/></svg>Tether</a>
     <span>Made by <a href="https://udaysinh.me">Udaysinh Sapate</a> at <a href="https://kurolabs.in">Kuro Labs</a>. Motion inspired by <a href="https://bencho.dev">Bencho</a>.</span>
     <span class="grow"></span>
+    <a href="/guide/">Guide</a>
+    <a href="https://discord.gg/DZNXsCySDD" rel="noopener">Discord</a>
     <a href="https://github.com/udaysinh-git/tether">GitHub</a>
   </div>
 </footer>

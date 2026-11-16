@@ -1,0 +1,15 @@
+# Tether
+
+> Tether is a browser extension and local MCP server that lets AI coding agents (Claude Code, Codex, Cursor, Gemini CLI and any MCP client) use the browser tabs a person shares, signed in as them. It runs entirely on the user's machine.
+
+- Agents can read pages as an outline with element references, click, type, fill forms, navigate, upload files and take screenshots.
+- Devtools: network requests with bodies, console messages and cookies.
+- Sites can be restyled with UserCSS and changed with userscripts compatible with Stylus and Tampermonkey.
+- Users stay in control: tabs are shared one at a time, agents ask before opening their own window, a visible cursor shows each action, and Pause holds the agent.
+- Works with Chrome, Brave, Edge, Firefox and Zen.
+
+## Links
+
+- [Home](https://tether.udaysinh.me/): features, setup and FAQ
+- [Guide](https://tether.udaysinh.me/guide/): how to let Claude Code or Codex use your real browser
+- [Community](https://discord.gg/DZNXsCySDD): Discord for ideas, feedback and early builds
