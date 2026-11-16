@@ -875,3 +875,13 @@
   const io = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { e.target.classList.add("seen"); io.unobserve(e.target); } }, { threshold: 0.15 });
   for (const el of $$(".inview")) io.observe(el);
 })();
+
+// The hero film plays muted; a click turns its sound on (and restarts it), a second click mutes it.
+{
+  const film = document.getElementById("watch");
+  const v = film?.querySelector("video");
+  film?.addEventListener("click", () => {
+    if (v.muted) { v.muted = false; v.currentTime = 0; v.play(); film.classList.add("sound"); }
+    else { v.muted = true; film.classList.remove("sound"); }
+  });
+}
