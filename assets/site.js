@@ -46,9 +46,95 @@
   }
 
   // ------------------------------------------------------------ hero words
+  // Words rise in one after another; inside each word every letter is its
+  // own span so the headline can answer the pointer (below).
   for (const h of $$("[data-words]")) {
-    h.innerHTML = h.textContent.trim().split(/\s+/).map((w, i) => `<span class="w" style="--i:${i}">${esc(w)}</span>`).join(" ");
+    h.innerHTML = h.textContent.trim().split(/\s+/).map((w, i) => `<span class="w" style="--i:${i}">${[...w].map((c) => `<span class="ch">${esc(c)}</span>`).join("")}</span>`).join(" ");
   }
+
+  // ------------------------------------------------------------ magnetic headline
+  // After Bencho's magnetic letters, with the font's weight axis added:
+  // each letter is a spring. Near the pointer it is drawn a little toward
+  // it, tilts its head toward it, thins from heavy to light so the word
+  // reshapes around the cursor, and warms toward gold. Move away and every
+  // letter springs back. Line breaks are fixed first so the morph never
+  // re-wraps the headline.
+  (() => {
+    const h = $(".hero h1[data-words]");
+    if (!h || reduce) return;
+    const field = h.closest(".hero");
+    const chars = $$(".ch", h);
+    const REST = 650, THIN = 260, REACH = 230;
+    const gold = [212, 175, 55], ink = [255, 251, 240];
+    const L = chars.map(() => ({ cx: 0, cy: 0, x: 0, y: 0, r: 0, w: 0, vx: 0, vy: 0, vr: 0, vw: 0 }));
+    let ptr = null, raf = 0, ready = false;
+
+    function lockLines() {
+      for (const br of $$("br.lk", h)) br.remove();
+      h.style.whiteSpace = "";
+      const words = $$(".w", h);
+      let top = null;
+      for (const w of words) {
+        if (top !== null && w.offsetTop > top + 4) w.before(Object.assign(document.createElement("br"), { className: "lk" }));
+        top = w.offsetTop;
+      }
+      h.style.whiteSpace = "nowrap";
+      measure();
+    }
+    function measure() {
+      // Letter centres relative to the headline's box, read without the
+      // springs' offsets so they are the letters' resting places.
+      const hr = h.getBoundingClientRect();
+      chars.forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        L[i].cx = r.left + r.width / 2 - hr.left - L[i].x;
+        L[i].cy = r.top + r.height / 2 - hr.top - L[i].y;
+      });
+    }
+    function frame() {
+      raf = 0;
+      let moving = false;
+      chars.forEach((c, i) => {
+        const l = L[i];
+        let tx = 0, ty = 0, tr = 0, tw = 0;
+        if (ptr) {
+          const dx = ptr.x - l.cx, dy = ptr.y - l.cy, d = Math.hypot(dx, dy);
+          const f = d < REACH ? (1 - d / REACH) ** 2 : 0;
+          tx = dx * 0.06 * f;
+          ty = dy * 0.2 * f;
+          tr = Math.max(-1, Math.min(1, dx / REACH)) * -10 * f;
+          tw = f;
+        }
+        // damped springs, a little under critical so they settle with give
+        l.vx = (l.vx + (tx - l.x) * 0.14) * 0.74; l.x += l.vx;
+        l.vy = (l.vy + (ty - l.y) * 0.14) * 0.74; l.y += l.vy;
+        l.vr = (l.vr + (tr - l.r) * 0.14) * 0.74; l.r += l.vr;
+        l.vw = (l.vw + (tw - l.w) * 0.12) * 0.76; l.w += l.vw;
+        if (Math.abs(l.vx) + Math.abs(l.vy) + Math.abs(l.vr) + Math.abs(l.vw) > 0.002 || Math.abs(tx - l.x) + Math.abs(ty - l.y) + Math.abs(tw - l.w) > 0.01) moving = true;
+        const k = Math.max(0, Math.min(1, l.w));
+        c.style.transform = `translate(${l.x.toFixed(2)}px, ${l.y.toFixed(2)}px) rotate(${l.r.toFixed(2)}deg)`;
+        c.style.fontWeight = String(Math.round(REST + (THIN - REST) * k));
+        const m = Math.min(1, k * 1.3);
+        c.style.color = `rgb(${ink.map((v, j) => Math.round(v + (gold[j] - v) * m)).join(",")})`;
+      });
+      if (moving) raf = requestAnimationFrame(frame);
+    }
+    const kick = () => { if (ready && !raf) raf = requestAnimationFrame(frame); };
+    field.addEventListener("pointermove", (e) => {
+      const r = h.getBoundingClientRect();
+      ptr = { x: e.clientX - r.left, y: e.clientY - r.top };
+      kick();
+    });
+    field.addEventListener("pointerenter", () => { if (ready) measure(); });
+    field.addEventListener("pointerleave", () => { ptr = null; kick(); });
+    // Wait for the font (widths) and for the words to finish rising in.
+    (document.fonts?.ready || Promise.resolve()).then(() => {
+      lockLines();
+      setTimeout(() => { ready = true; measure(); kick(); }, 1400);
+    });
+    let rt = 0;
+    addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(lockLines, 150); });
+  })();
 
   // ------------------------------------------------------------ dot field
   // Every dot is its own spring: pulled toward the pointer, falling off with
@@ -615,7 +701,7 @@
         f.style.transform = k < step && auto ? "scaleX(1)" : "scaleX(0)";
       }
       moveJelly(prev);
-      morph(stage, () => scenes[step](alive));
+      scenes[step](alive);
       if (!reduce) stage.firstElementChild?.animate([{ opacity: 0, filter: "blur(6px)", transform: "translateY(6px)" }, { opacity: 1, filter: "blur(0)", transform: "none" }], { duration: 460, easing: "cubic-bezier(.22,1,.36,1)" });
       clearTimeout(timer);
       if (auto && !keep) {
@@ -686,6 +772,7 @@
       () => `<div class="qv files">${[["dark-dashboard.user.css", "Stylus"], ["fill-timesheet.user.js", "Tampermonkey"], ["hide-banners.user.js", "Violentmonkey"]].map(([f, m], i) => `<div class="qfile" style="--i:${i}"><span class="fn">${f}</span><span class="arrow"></span><span class="mgr">${m}</span></div>`).join("")}</div>`,
       () => `<div class="qv flow"><span class="qnode">Claude Code</span><span class="qline"><i></i></span><span class="qnode core">Tether host</span><span class="qline"><i></i></span><span class="qnode">Your browser</span></div>`,
       () => `<div class="qv vote"><button class="qup press" type="button" aria-pressed="${voted}"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span class="qcount">${votes}</span></button><div class="qidea"><b>Your idea goes here</b><small>The most upvoted ideas in the Discord get built first</small></div></div>`,
+      () => `<div class="qv versus"><div class="vcol"><small>Gemini in Chrome</small>${["Chrome only", "Gemini only", "Side panel", "Paid plan for auto browse"].map((t, i) => `<span class="vrow" style="--i:${i}">${t}</span>`).join("")}</div><div class="vcol on"><small>Tether</small>${["Chrome, Firefox and forks", "Claude Code, Codex, any MCP agent", "Next to your code and terminal", "Free, runs on your machine"].map((t, i) => `<span class="vrow" style="--i:${i + 1}">${t}</span>`).join("")}</div></div>`,
       () => `<div class="qv ticket"><div class="qticket"><span class="tk-l"><small>Early access</small><b>Tether</b><span>Ask in the Discord</span></span><span class="tk-r"><a class="pill-btn gold press" href="https://discord.gg/UcB8z8u4JP" rel="noopener">Join</a></span></div></div>`,
     ];
 
