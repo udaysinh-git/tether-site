@@ -4,7 +4,7 @@
 
 <p align="center">The website for <a href="https://tether.udaysinh.me">Tether</a>, which lets Claude Code, Codex and any MCP agent use the browser tabs you share, signed in as you.</p>
 
-<p align="center"><a href="https://tether.udaysinh.me">Visit the site</a> · <a href="https://tether.udaysinh.me/guide/">Guide</a> · <a href="https://discord.gg/DZNXsCySDD">Discord</a></p>
+<p align="center"><a href="https://tether.udaysinh.me">Visit the site</a> · <a href="https://tether.udaysinh.me/guide/">Guide</a> · <a href="https://discord.gg/UcB8z8u4JP">Discord</a></p>
 
 ## What's here
 

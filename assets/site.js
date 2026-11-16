@@ -679,7 +679,7 @@
       () => `<div class="qv files">${[["dark-dashboard.user.css", "Stylus"], ["fill-timesheet.user.js", "Tampermonkey"], ["hide-banners.user.js", "Violentmonkey"]].map(([f, m], i) => `<div class="qfile" style="--i:${i}"><span class="fn">${f}</span><span class="arrow"></span><span class="mgr">${m}</span></div>`).join("")}</div>`,
       () => `<div class="qv flow"><span class="qnode">Claude Code</span><span class="qline"><i></i></span><span class="qnode core">Tether host</span><span class="qline"><i></i></span><span class="qnode">Your browser</span></div>`,
       () => `<div class="qv vote"><button class="qup press" type="button" aria-pressed="${voted}"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span class="qcount">${votes}</span></button><div class="qidea"><b>Your idea goes here</b><small>The most upvoted ideas in the Discord get built first</small></div></div>`,
-      () => `<div class="qv ticket"><div class="qticket"><span class="tk-l"><small>Early access</small><b>Tether</b><span>Ask in the Discord</span></span><span class="tk-r"><a class="pill-btn gold press" href="https://discord.gg/DZNXsCySDD" rel="noopener">Join</a></span></div></div>`,
+      () => `<div class="qv ticket"><div class="qticket"><span class="tk-l"><small>Early access</small><b>Tether</b><span>Ask in the Discord</span></span><span class="tk-r"><a class="pill-btn gold press" href="https://discord.gg/UcB8z8u4JP" rel="noopener">Join</a></span></div></div>`,
     ];
 
     list.insertAdjacentHTML("beforeend", data.map((d, i) => `<button role="tab" aria-selected="${i === 0}" class="qitem"><span class="qn">${String(i + 1).padStart(2, "0")}</span><span>${esc(d.q)}</span></button>`).join(""));

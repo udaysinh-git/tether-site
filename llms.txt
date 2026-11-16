@@ -12,4 +12,4 @@
 
 - [Home](https://tether.udaysinh.me/): features, setup and FAQ
 - [Guide](https://tether.udaysinh.me/guide/): how to let Claude Code or Codex use your real browser
-- [Community](https://discord.gg/DZNXsCySDD): Discord for ideas, feedback and early builds
+- [Community](https://discord.gg/UcB8z8u4JP): the KuroLabs Discord, where the #tether channel has ideas, feedback and early builds
