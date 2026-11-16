@@ -586,10 +586,10 @@
     }
 
     const CMDS = {
-      "Claude Code": { file: "Terminal", lines: ["claude mcp add --scope user tether -- node /path/to/tether/host/cli.js"] },
-      Codex: { file: "~/.codex/config.toml", lines: ["[mcp_servers.tether]", "command = 'node'", "args = ['/path/to/tether/host/cli.js']"] },
-      Cursor: { file: ".cursor/mcp.json", lines: ['{ "mcpServers": { "tether": {', '  "command": "node",', '  "args": ["/path/to/tether/host/cli.js"] } } }'] },
-      "Gemini CLI": { file: "~/.gemini/settings.json", lines: ['{ "mcpServers": { "tether": {', '  "command": "node",', '  "args": ["/path/to/tether/host/cli.js"] } } }'] },
+      "Claude Code": { file: "Terminal", lines: ["claude mcp add --scope user tether -- node /path/to/tether-browser/host/cli.js"] },
+      Codex: { file: "~/.codex/config.toml", lines: ["[mcp_servers.tether]", "command = 'node'", "args = ['/path/to/tether-browser/host/cli.js']"] },
+      Cursor: { file: ".cursor/mcp.json", lines: ['{ "mcpServers": { "tether": {', '  "command": "node",', '  "args": ["/path/to/tether-browser/host/cli.js"] } } }'] },
+      "Gemini CLI": { file: "~/.gemini/settings.json", lines: ['{ "mcpServers": { "tether": {', '  "command": "node",', '  "args": ["/path/to/tether-browser/host/cli.js"] } } }'] },
     };
     let agent = "Claude Code", browser = "Chrome";
 
@@ -621,10 +621,10 @@
     const scenes = [
       // 1 · install
       (alive) => {
-        stage.innerHTML = `<div class="scene sc-term"><div class="term"><div class="tbar"><span>Terminal</span>${copyBtn}</div><div class="tbody" id="tb"></div></div><p class="pnote"><b>setup</b> prints your pairing key and the lines for your agents, and registers the bridge Firefox uses.</p></div>`;
-        $(".pcopy", stage).dataset.copy = "git clone https://github.com/udaysinh-git/tether.git\ncd tether && npm install && npm run build\nnode host/cli.js setup";
-        typeLines($("#tb"), ["git clone https://github.com/udaysinh-git/tether.git", "cd tether && npm install && npm run build", "node host/cli.js setup"], alive, {
-          out: [["ok", "built dist/chrome and dist/firefox"], ["ok", "Firefox bridge registered"], ["key", 'Pairing key <span class="k">k7qm-3vxa-p9dw-r2tn</span>']],
+        stage.innerHTML = `<div class="scene sc-term"><div class="term"><div class="tbar"><span>Terminal</span>${copyBtn}</div><div class="tbody" id="tb"></div></div><p class="pnote"><b>tether setup</b> prints your pairing key and the lines for your agents, and registers the bridge Firefox uses.</p></div>`;
+        $(".pcopy", stage).dataset.copy = "npm install -g tether-browser\ntether setup";
+        typeLines($("#tb"), ["npm install -g tether-browser", "tether setup"], alive, {
+          out: [["ok", "added tether-browser"], ["ok", "Firefox bridge registered"], ["key", 'Pairing key <span class="k">k7qm-3vxa-p9dw-r2tn</span>']],
         });
       },
       // 2 · agent
@@ -636,7 +636,7 @@
           $(".pcopy", box).dataset.copy = c.lines.join("\n");
           if (!first && !reduce) $(".tbody", box).animate([{ opacity: 0, transform: "translateY(8px)", filter: "blur(5px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], { duration: 420, easing: "cubic-bezier(.22,1,.36,1)" });
         };
-        stage.innerHTML = `<div class="scene sc-agent"><div class="seg" role="radiogroup" aria-label="Agent">${Object.keys(CMDS).map((a) => `<button role="radio" aria-checked="${a === agent}" class="press">${esc(a)}</button>`).join("")}</div><div class="term cfg"></div><p class="pnote">Any other MCP client runs the same command as a stdio server.</p></div>`;
+        stage.innerHTML = `<div class="scene sc-agent"><div class="seg" role="radiogroup" aria-label="Agent">${Object.keys(CMDS).map((a) => `<button role="radio" aria-checked="${a === agent}" class="press">${esc(a)}</button>`).join("")}</div><div class="term cfg"></div><p class="pnote"><b>tether setup</b> prints these with your real paths. Any other MCP client runs the same command as a stdio server.</p></div>`;
         draw(true);
         for (const b of $$(".seg button", stage)) b.addEventListener("click", () => {
           agent = b.textContent; auto = false; sound("select");
@@ -664,7 +664,7 @@
             box.innerHTML = `<div class="ph"><span class="pmark"></span><b>Tether</b><span class="pst"><span class="dot beat"></span>Ready</span></div><div class="pcard"><div class="t">${browser === "Chrome" ? "Paired" : "Signed add-on installed"}</div><div class="s">${browser === "Chrome" ? "Share a tab, or let your agent ask for one." : "No key needed. The bridge supplies it."}</div><span class="btn amber full">Share this tab</span></div>`;
           });
         };
-        stage.innerHTML = `<div class="scene sc-ext"><div class="seg" role="radiogroup" aria-label="Browser">${["Chrome", "Firefox"].map((b) => `<button role="radio" aria-checked="${b === browser}" class="press">${b === "Chrome" ? "Chrome, Brave, Edge" : "Firefox, Zen"}</button>`).join("")}</div><div class="popup"></div><p class="pnote">${browser === "Chrome" ? "Open chrome://extensions, turn on Developer mode, load dist/chrome." : "Install the signed .xpi from Add-ons, then Install Add-on From File."}</p></div>`;
+        stage.innerHTML = `<div class="scene sc-ext"><div class="seg" role="radiogroup" aria-label="Browser">${["Chrome", "Firefox"].map((b) => `<button role="radio" aria-checked="${b === browser}" class="press">${b === "Chrome" ? "Chrome, Brave, Edge" : "Firefox, Zen"}</button>`).join("")}</div><div class="popup"></div><p class="pnote">${browser === "Chrome" ? 'Download the zip from the <a href="https://github.com/udaysinh-git/tether/releases/latest">latest release</a>, unzip it, and load it in chrome://extensions with Developer mode on.' : 'Download the signed .xpi from the <a href="https://github.com/udaysinh-git/tether/releases/latest">latest release</a> and open it with Firefox or Zen.'}</p></div>`;
         for (const b of $$(".seg button", stage)) b.addEventListener("click", () => {
           browser = b.textContent.startsWith("Chrome") ? "Chrome" : "Firefox"; auto = false; sound("select");
           go(2, true);

@@ -597,3 +597,5 @@ h2 { font: 650 clamp(30px, 3.6vw, 42px)/1.12 var(--head); letter-spacing: -0.02e
 .article .src { margin-top: 32px; font-size: 13.5px; color: var(--text-3); }
 .article .src a { color: var(--text-2); }
 .tr { grid-template-columns: 1fr 1fr 1.4fr; }
+
+.pnote a { color: var(--gold); text-underline-offset: 3px; }
