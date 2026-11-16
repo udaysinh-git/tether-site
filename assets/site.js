@@ -10,6 +10,10 @@
   const css = getComputedStyle(document.documentElement);
   const ISLAND = css.getPropertyValue("--island").trim();
   const POP = css.getPropertyValue("--pop").trim();
+  // Sounds (Bencho's, see sounds.js) play only for things you do, never for
+  // the demos running on their own. The speaker button in the header mutes them.
+  let soundOn = localStorage.getItem("tether-sound") !== "off";
+  const sound = (name, opts) => { if (soundOn && !reduce) globalThis.tetherSound?.play(name, opts); };
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
   // Run a demo only while its card is on screen.
@@ -98,6 +102,7 @@
     const cards = $$(".card");
     for (const c of chips) c.addEventListener("click", () => {
       const f = c.dataset.filter;
+      sound("tick", { pitch: 1.4, volume: 0.8 });
       for (const x of chips) x.setAttribute("aria-pressed", String(x === c));
       // FLIP: remember where each card was, filter, then spring them home.
       const before = new Map(cards.map((k) => [k, k.getBoundingClientRect()]));
@@ -137,12 +142,13 @@
       morph(el, () => {
         if (state === "idle") {
           el.innerHTML = `${page}<button class="btn amber go press">Share this tab</button><div class="s">Your agent can use this tab and any tab it opens, until you stop.</div>`;
-          $(".go", el).addEventListener("click", () => { state = "shared"; render(); tick(); });
+          $(".go", el).addEventListener("click", (e) => { if (e.isTrusted) sound("landed"); state = "shared"; render(); tick(); });
         } else {
           el.innerHTML = `${page}<div class="live swap-in"><div class="head"><span class="dot beat"></span>Claude Code can use this tab</div><div class="what" id="what">Waiting for its first step</div></div><div class="row swap-in" style="animation-delay:.05s"><button class="btn press" id="pz">Pause</button><button class="btn press" id="stop">Stop sharing</button></div>`;
-          $("#stop", el).addEventListener("click", () => { clearInterval(timer); state = "idle"; render(); });
+          $("#stop", el).addEventListener("click", () => { sound("hush"); clearInterval(timer); state = "idle"; render(); });
           $("#pz", el).addEventListener("click", (e) => {
             const p = e.target.textContent === "Pause";
+            sound(p ? "drape" : "float");
             e.target.textContent = p ? "Resume" : "Pause";
             setWhat(p ? "Paused. Claude Code waits for you." : "Back to work");
           });
@@ -166,39 +172,68 @@
   })();
 
   // ------------------------------------------------------------ 2 · island
+  // The real panel's states, with working buttons. The shape and the content
+  // are separate: the content is laid out at its final size at once and the
+  // shape springs around it, so nothing wraps while it moves.
   (() => {
     const el = $("#island");
-    const states = [
-      { t: "Shared with Claude Code", s: "Waiting for an agent", btns: ["Pause", "Stop"] },
-      { t: "Shared with Claude Code", s: "clicked “Continue”", btns: ["Pause", "Stop"] },
-      { t: "Shared with Claude Code", s: "typed your email", btns: ["Pause", "Stop"] },
-      { t: "Claude Code needs you", s: "Please type the 6-digit code from your phone, then press Done.", btns: ["Done", "Stop"], ask: true },
-      { t: "Shared with Claude Code", s: "pressed “Verify”", btns: ["Pause", "Stop"] },
-      { t: "Paused", s: "Claude Code will wait until you resume", btns: ["Resume", "Stop"] },
-    ];
-    let i = 0;
-    function show(k, first) {
-      const st = states[k];
-      const sameShape = !first && !!st.ask === el.classList.contains("ask") && $(".t", el)?.textContent === st.t;
-      morph(el, () => {
-        el.classList.toggle("ask", !!st.ask);
-        el.innerHTML = `<span class="dot beat"></span><span class="lines"><div class="t">${esc(st.t)}</div><div class="s">${esc(st.s)}</div></span><span class="btns">${st.btns.map((b, j) => `<span class="btn ${st.ask && j === 0 ? "amber" : ""}">${b}</span>`).join("")}</span>`;
-      });
-      if (reduce || first) return;
-      const lines = $(".lines", el);
-      if (sameShape) {
-        lines.animate([{ opacity: 0, transform: "translateY(5px)", filter: "blur(4px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], { duration: 320, easing: "cubic-bezier(.22,1,.36,1)" });
-        el.animate([{ scale: 1 }, { scale: 1.04 }, { scale: 1 }], { duration: 440, easing: POP });
-      } else {
-        lines.animate([{ opacity: 0, scale: 0.92, filter: "blur(6px)" }, { opacity: 1, scale: 1, filter: "blur(0)" }], { duration: 280, delay: 70, easing: "ease-out", fill: "backwards" });
-      }
+    el.innerHTML = `<div class="in"></div>`;
+    const inner = $(".in", el);
+    const acts = ["clicked “Continue”", "typed your email", "opened “Billing”", "read the network log", "pressed “Verify”"];
+    let mode = "shared", k = 0, steps = 0, quietUntil = 0;
+    function view() {
+      if (mode === "ask") return { t: "Claude Code needs you", s: "Please type the 6-digit code from your phone, then press Done.", btns: [["done", "Done", "amber"], ["stop", "Stop"]], ask: true };
+      if (mode === "paused") return { t: "Paused", s: "Claude Code will wait until you resume", btns: [["resume", "Resume"], ["stop", "Stop"]] };
+      if (mode === "stopped") return { t: "Not shared", s: "The agent can't use this tab", btns: [["share", "Share again", "amber"]], dot: "grey" };
+      return { t: "Shared with Claude Code", s: k ? acts[(k - 1) % acts.length] : "Waiting for its first step", btns: [["pause", "Pause"], ["stop", "Stop"]] };
     }
-    show(0, true);
-    const next = () => { i = (i + 1) % states.length; show(i); };
-    el.addEventListener("click", next);
-    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); next(); } });
-    demos.island = next;
-    whenVisible(el, () => { const t = setInterval(next, 2400); return { stop() { clearInterval(t); } }; });
+    function render(first) {
+      const v = view();
+      const html = `<span class="dot ${v.dot || "beat"}"></span><span class="lines"><div class="t">${esc(v.t)}</div><div class="s">${esc(v.s)}</div></span><span class="btns">${v.btns.map(([a, label, c]) => `<button type="button" class="btn press ${c || ""}" data-a="${a}">${label}</button>`).join("")}</span>`;
+      const sameShape = !first && !!v.ask === el.classList.contains("ask") && $(".t", inner)?.textContent === v.t && $(".btns", inner)?.textContent === v.btns.map((b) => b[1]).join("");
+      const a = el.getBoundingClientRect();
+      const ra = getComputedStyle(el).borderTopLeftRadius;
+      el.classList.toggle("ask", !!v.ask);
+      inner.innerHTML = html;
+      if (reduce || first) return;
+      if (sameShape) {
+        $(".lines", inner).animate([{ opacity: 0, transform: "translateY(5px)", filter: "blur(4px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], { duration: 320, easing: "cubic-bezier(.22,1,.36,1)" });
+        el.animate([{ scale: 1 }, { scale: 1.04 }, { scale: 1 }], { duration: 440, easing: POP });
+        return;
+      }
+      const b = el.getBoundingClientRect();
+      const rb = getComputedStyle(el).borderTopLeftRadius;
+      inner.style.width = `${b.width}px`;
+      inner.style.height = `${b.height}px`;
+      const run = el.animate([{ width: `${a.width}px`, height: `${a.height}px`, borderRadius: ra }, { width: `${b.width}px`, height: `${b.height}px`, borderRadius: rb }], { duration: 560, easing: ISLAND });
+      inner.animate([{ opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0)" }], { duration: 300, delay: 40, easing: "ease-out", fill: "backwards" });
+      run.finished.then(() => { inner.style.width = ""; inner.style.height = ""; }, () => {});
+    }
+    inner.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      quietUntil = Date.now() + 7000;
+      const a = b.dataset.a;
+      if (a === "pause") { mode = "paused"; sound("drape"); }
+      if (a === "resume") { mode = "shared"; sound("float"); }
+      if (a === "done") { mode = "shared"; k++; sound("paid"); }
+      if (a === "stop") { mode = "stopped"; sound("hush"); }
+      if (a === "share") { mode = "shared"; k = 0; sound("landed"); }
+      render();
+    });
+    render(true);
+    // On its own: the agent works, and every few steps asks for you.
+    function tick() {
+      if (Date.now() < quietUntil || mode === "paused" || mode === "stopped") return;
+      if (mode === "ask") return;
+      steps++;
+      if (steps % 4 === 0) { mode = "ask"; render(); return; }
+      k++; render();
+    }
+    demos.island = () => { quietUntil = 0; if (mode === "ask") { mode = "shared"; k++; } tick(); };
+    whenVisible(el, () => { const t = setInterval(tick, 2300); return { stop() { clearInterval(t); } }; });
+    // An answered ask returns to work after a moment if nobody presses Done.
+    setInterval(() => { if (mode === "ask" && Date.now() > quietUntil + 5000) { mode = "shared"; k++; render(); } }, 6000);
   })();
 
   // ------------------------------------------------------------ 3 · cursor
@@ -309,7 +344,7 @@
       morph(el, () => {
         el.innerHTML = `<div class="who swap-in"><span class="badge">C<span class="dot beat"></span></span><div class="t">Codex wants its own window</div></div><div class="reason swap-in" style="animation-delay:.05s">“Compare this order across your three supplier sites”</div><div class="row swap-in" style="animation-delay:.1s"><button class="btn press" data-a="no">Not now</button><button class="btn amber press" data-a="yes">Open window</button></div>`;
       });
-      for (const b of $$("button", el)) b.addEventListener("click", () => answer(b.dataset.a === "yes"));
+      for (const b of $$("button", el)) b.addEventListener("click", () => { sound(b.dataset.a === "yes" ? "landed" : "hush"); answer(b.dataset.a === "yes"); });
     }
     function answer(yes) {
       morph(el, () => {
@@ -329,6 +364,7 @@
     const sw = $(".switch", row);
     const flip = () => {
       sw.classList.toggle("on");
+      sound("latch", { pitch: sw.classList.contains("on") ? 1.12 : 0.89 });
       if (!reduce) sw.animate([{ scale: "1 1" }, { scale: "1.3 0.78", offset: 0.28 }, { scale: "0.95 1.05", offset: 0.62 }, { scale: "1 1" }], { duration: 560, easing: "ease-out", pseudoElement: "::after" });
     };
     row.addEventListener("click", flip);
@@ -385,7 +421,7 @@
     let x = 50, dragging = false, auto = true;
     const set = (v) => { x = Math.max(0, Math.min(100, v)); c.style.setProperty("--x", `${x}%`); c.setAttribute("aria-valuenow", String(Math.round(x))); };
     const fromEvent = (e) => { const r = c.getBoundingClientRect(); set(((e.clientX - r.left) / r.width) * 100); };
-    c.addEventListener("pointerdown", (e) => { dragging = true; auto = false; c.setPointerCapture(e.pointerId); fromEvent(e); });
+    c.addEventListener("pointerdown", (e) => { sound("tick", { volume: 0.7 }); dragging = true; auto = false; c.setPointerCapture(e.pointerId); fromEvent(e); });
     c.addEventListener("pointermove", (e) => dragging && fromEvent(e));
     c.addEventListener("pointerup", () => (dragging = false));
     c.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") set(x - 5); if (e.key === "ArrowRight") set(x + 5); auto = false; });
@@ -399,37 +435,48 @@
   })();
 
   // ------------------------------------------------------------ 10 · watchers
+  // Bencho's toast stack: the newest in front, two tucked behind; point at it
+  // and it fans out into a list.
   (() => {
     const box = $("#toasts");
-    const alerts = [["Price dropped to ₹1,940", "Sony WH-1000XM6 on your watchlist"], ["Results are posted", "Semester 5 grades on the portal"], ["Slot opened", "Passport appointment, 21 Nov, 10:30"], ["New reply", "Your support ticket #4821"]];
+    const stack = globalThis.createToastStack(box, { keep: true });
+    const alerts = [
+      { kind: "bell", title: "Price dropped to ₹1,940", body: "Sony WH-1000XM6 on your watchlist", action: "Open" },
+      { kind: "success", title: "Results are posted", body: "Semester 5 grades on the portal" },
+      { kind: "bell", title: "Slot opened", body: "Passport appointment, 21 Nov, 10:30", action: "Book" },
+      { kind: "warning", title: "Login expired", body: "The watcher needs you to sign in again" },
+      { kind: "info", title: "No change", body: "Checked the order page at 14:20" },
+    ];
     let k = 0;
-    function layout() {
-      const items = [...box.children].reverse();
-      items.forEach((t, i) => { t.style.translate = `0 ${-i * 14}px`; t.style.scale = String(1 - i * 0.05); t.style.opacity = i > 2 ? "0" : String(1 - i * 0.22); t.style.zIndex = String(10 - i); });
-    }
-    function push() {
-      const [t, s] = alerts[k++ % alerts.length];
-      const el = document.createElement("div");
-      el.className = "toast";
-      el.innerHTML = `<span class="ic"><svg><use href="#i-bell"/></svg></span><span><div class="t">${esc(t)}</div><div class="s">${esc(s)}</div></span>`;
-      box.appendChild(el);
-      if (!reduce) el.animate([{ opacity: 0, transform: "translateY(24px) scale(.94)", filter: "blur(6px)" }, { opacity: 1, transform: "none", filter: "blur(0)" }], { duration: 560, easing: ISLAND });
-      while (box.children.length > 4) box.firstElementChild.remove();
-      layout();
-    }
-    push(); push();
-    demos.toasts = push;
-    whenVisible(box, () => { const t = setInterval(push, 2600); return { stop() { clearInterval(t); } }; });
+    const push = (user) => {
+      const a = alerts[k++ % alerts.length];
+      if (user) sound("perk");
+      stack.show({ ...a, onAction: (t, h) => { sound("landed"); h.update({ kind: "success", title: a.action === "Book" ? "Booked for 21 Nov" : "Opened in a new tab", body: "Tether used your session", action: null }); } });
+    };
+    box.addEventListener("click", (e) => { if (e.target.closest(".tst-x")) sound("hush", { volume: 0.7 }); });
+    push(); push(); push();
+    demos.toasts = () => push(true);
+    whenVisible(box, () => { const t = setInterval(() => { if (!box.matches(":hover")) push(); }, 3200); return { stop() { clearInterval(t); } }; });
   })();
 
   // replay buttons
-  for (const b of $$("[data-replay]")) b.addEventListener("click", () => demos[b.dataset.replay]?.());
+  for (const b of $$("[data-replay]")) b.addEventListener("click", () => { if (b.dataset.replay !== "toasts") sound("tick", { pitch: 1.2 }); demos[b.dataset.replay]?.(); });
+
+  // header mute switch
+  (() => {
+    const b = $("#mute");
+    if (!b) return;
+    const show = () => { b.setAttribute("aria-pressed", String(!soundOn)); b.setAttribute("aria-label", soundOn ? "Mute sounds" : "Turn sounds on"); b.classList.toggle("off", !soundOn); };
+    b.addEventListener("click", () => { soundOn = !soundOn; localStorage.setItem("tether-sound", soundOn ? "on" : "off"); show(); sound("latch", { pitch: 1.12 }); });
+    show();
+  })();
 
   // ------------------------------------------------------------ copy fields
   for (const b of $$(".copy button")) {
     b.addEventListener("click", async () => {
       try { await navigator.clipboard.writeText($("pre", b.parentElement).textContent); } catch {}
       b.classList.add("done");
+      sound("plop");
       setTimeout(() => b.classList.remove("done"), 1600);
     });
   }
@@ -440,6 +487,7 @@
     for (const q of $$(".q", faq)) {
       $("button", q).addEventListener("click", () => {
         const open = !q.classList.contains("open");
+        sound(open ? "wisp" : "hush", { volume: 0.8 });
         for (const o of $$(".q", faq)) { o.classList.remove("open"); $("button", o).setAttribute("aria-expanded", "false"); }
         q.classList.toggle("open", open);
         $("button", q).setAttribute("aria-expanded", String(open));
