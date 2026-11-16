@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://tether.udaysinh.me/sitemap.xml
