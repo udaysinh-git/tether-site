@@ -496,6 +496,14 @@
     }
   })();
 
+  // ------------------------------------------------------------ no copying
+  // Selection is off in CSS; this also stops copy, cut, drag and the context
+  // menu. The Copy buttons write to the clipboard directly, so they still work.
+  for (const ev of ["copy", "cut", "dragstart", "contextmenu", "selectstart"]) document.addEventListener(ev, (e) => e.preventDefault());
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && ["c", "x", "a", "s", "u"].includes(e.key.toLowerCase())) e.preventDefault();
+  });
+
   // ------------------------------------------------------------ in view
   const io = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { e.target.classList.add("seen"); io.unobserve(e.target); } }, { threshold: 0.15 });
   for (const el of $$(".inview")) io.observe(el);

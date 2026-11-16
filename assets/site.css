@@ -34,6 +34,10 @@
 }
 
 * { box-sizing: border-box; }
+/* Text on the site can't be selected or copied. The setup commands still
+   copy through their own Copy buttons. */
+html { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+img, svg { -webkit-user-drag: none; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
