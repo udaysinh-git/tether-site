@@ -81,7 +81,7 @@
         d.ox += d.vx; d.oy += d.vy;
         if (Math.abs(d.vx) + Math.abs(d.vy) > 0.01 || Math.abs(tx - d.ox) > 0.05) moving = true;
         const near = Math.max(0, 1 - Math.hypot(px - d.x - d.ox, py - d.y - d.oy) / R);
-        ctx.fillStyle = near > 0.02 ? `rgba(232,163,61,${0.18 + near * 0.6})` : "rgba(236,232,225,0.13)";
+        ctx.fillStyle = near > 0.02 ? `rgba(212,175,55,${0.18 + near * 0.6})` : "rgba(255,251,240,0.13)";
         ctx.beginPath();
         ctx.arc(d.x + d.ox, d.y + d.oy, 1.1 + near * 1.3, 0, Math.PI * 2);
         ctx.fill();
@@ -241,7 +241,7 @@
     const desk = $("#desk");
     const cur = document.createElement("div");
     cur.className = "agent-cur";
-    cur.innerHTML = `<div class="body"><svg width="18" height="22" viewBox="0 0 18 22"><path d="M1.5 1.5 L1.5 17.5 L5.8 13.6 L8.9 20.5 L11.8 19.2 L8.8 12.5 L14.6 12.5 Z" fill="#e8a33d" stroke="#22180a" stroke-width="1.4" stroke-linejoin="round"/></svg><span class="tag">Claude Code</span></div>`;
+    cur.innerHTML = `<div class="body"><svg width="18" height="22" viewBox="0 0 18 22"><path d="M1.5 1.5 L1.5 17.5 L5.8 13.6 L8.9 20.5 L11.8 19.2 L8.8 12.5 L14.6 12.5 Z" fill="#d4af37" stroke="#1a1a1a" stroke-width="1.4" stroke-linejoin="round"/></svg><span class="tag">Claude Code</span></div>`;
     desk.appendChild(cur);
     const fields = $$(".field", desk);
     const send = $(".send", desk);
@@ -262,7 +262,7 @@
     let lp;
     const run = () => loop(async (alive) => {
       fields.forEach((f, k) => (f.textContent = k ? "Company" : "Work email"));
-      fields.forEach((f) => (f.style.color = "#8a857c"));
+      fields.forEach((f) => (f.style.color = "#878580"));
       go([300, 210]); await sleep(700);
       for (const [k, text] of [[0, "uday@kurolabs.in"], [1, "Kuro Labs"]]) {
         if (!alive()) return;

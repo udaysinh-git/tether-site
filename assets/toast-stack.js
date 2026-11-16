@@ -18,36 +18,36 @@
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
   };
   const CSS = `
-    .tst { position: relative; width: 100%; font: inherit; color: #ece8e1; pointer-events: auto; }
+    .tst { position: relative; width: 100%; font: inherit; color: #fffbf0; pointer-events: auto; }
     .tst-toast {
       position: absolute; left: 0; right: 0; bottom: 0; height: ${H}px; box-sizing: border-box;
       display: flex; align-items: center; gap: 12px; padding: 0 10px 0 14px;
-      border-radius: 20px; background: #262421;
-      box-shadow: 0 0 0 1px rgb(236 232 225 / .07), 0 12px 30px rgb(0 0 0 / .35);
+      border-radius: 20px; background: #2d2d2d;
+      box-shadow: 0 0 0 1px rgb(255 251 240 / .07), 0 12px 30px rgb(0 0 0 / .35);
       transform-origin: 50% 0;
       transition: transform .52s ${SPRING}, opacity .3s ease, background-color .22s ease;
     }
-    .tst:not(.open) .tst-toast:not(.front) { background: #2d2b28; }
+    .tst:not(.open) .tst-toast:not(.front) { background: #333333; }
     .tst-toast > * { transition: opacity .22s ease; }
     .tst:not(.open) .tst-toast:not(.front) > * { opacity: 0; }
     .tst-toast.out { transition: transform .22s cubic-bezier(.4, 0, 1, 1), opacity .22s ease; }
-    .tst-icon { flex: none; display: grid; place-items: center; color: #a9a49b; }
+    .tst-icon { flex: none; display: grid; place-items: center; color: #a9a6a0; }
     .tst-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .tst-toast[data-kind="success"] .tst-icon { color: #7fbf8e; }
     .tst-toast[data-kind="error"] .tst-icon { color: #e0806b; }
-    .tst-toast[data-kind="warning"] .tst-icon, .tst-toast[data-kind="bell"] .tst-icon { color: #e8a33d; }
+    .tst-toast[data-kind="warning"] .tst-icon, .tst-toast[data-kind="bell"] .tst-icon { color: #d4af37; }
     .tst-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; text-align: left; }
     .tst-text b { font-size: 13.5px; font-weight: 600; line-height: 18px; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tst-text span { font-size: 12.5px; line-height: 17px; color: #a9a49b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tst-text span { font-size: 12.5px; line-height: 17px; color: #a9a6a0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .tst-text span:empty { display: none; }
     .tst button { font: inherit; color: inherit; border: 0; cursor: pointer; }
-    .tst-act { flex: none; height: 28px; padding: 0 12px; border-radius: 999px; background: rgb(236 232 225 / .08); font-size: 13px; font-weight: 500; transition: scale .16s cubic-bezier(.22, 1, .36, 1), background-color .15s; }
-    .tst-act:hover { background: rgb(236 232 225 / .13); }
+    .tst-act { flex: none; height: 28px; padding: 0 12px; border-radius: 999px; background: rgb(255 251 240 / .08); font-size: 13px; font-weight: 500; transition: scale .16s cubic-bezier(.22, 1, .36, 1), background-color .15s; }
+    .tst-act:hover { background: rgb(255 251 240 / .13); }
     .tst-act:active { scale: .96; }
-    .tst-x { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 999px; background: none; color: #8a857c; transition: background-color .16s, color .16s; }
-    .tst-x:hover { background: rgb(236 232 225 / .08); color: #ece8e1; }
+    .tst-x { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 999px; background: none; color: #878580; transition: background-color .16s, color .16s; }
+    .tst-x:hover { background: rgb(255 251 240 / .08); color: #fffbf0; }
     .tst-x svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
-    .tst button:focus-visible { outline: 2px solid #e8a33d; outline-offset: 1px; }
+    .tst button:focus-visible { outline: 2px solid #d4af37; outline-offset: 1px; }
     @media (prefers-reduced-motion: reduce) { .tst-toast, .tst-toast > * { transition: none !important; } }
   `;
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
