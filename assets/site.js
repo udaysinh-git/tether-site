@@ -459,7 +459,14 @@
     const b = $("#mute");
     if (!b) return;
     const show = () => { b.setAttribute("aria-pressed", String(!soundOn)); b.setAttribute("aria-label", soundOn ? "Mute sounds" : "Turn sounds on"); b.classList.toggle("off", !soundOn); };
-    b.addEventListener("click", () => { soundOn = !soundOn; localStorage.setItem("tether-sound", soundOn ? "on" : "off"); show(); sound("latch", { pitch: 1.12 }); });
+    b.addEventListener("click", () => {
+      soundOn = !soundOn;
+      localStorage.setItem("tether-sound", soundOn ? "on" : "off");
+      show();
+      const body = $(".body", b);
+      body.classList.remove("bump"); void body.getBoundingClientRect(); body.classList.add("bump");
+      sound("latch", { pitch: 1.12 });
+    });
     show();
   })();
 
