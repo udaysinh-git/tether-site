@@ -113,7 +113,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .agents span { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 999px; background: rgb(255 251 240 / 0.05); color: var(--text-2); font-size: 13.5px; font-weight: 500; }
 .agents span i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
 .agents span.on i { background: var(--gold); }
-.hero .actions { display: flex; justify-content: center; gap: 10px; margin-top: 34px; }
+.hero .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 34px; }
 .hero .film { margin: 56px auto 0; max-width: 1040px; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 1px rgb(255 251 240 / 0.1), 0 24px 60px rgb(0 0 0 / 0.35); background: #141414; aspect-ratio: 16 / 9; }
 .hero .film { position: relative; cursor: pointer; }
 .hero .film figcaption { position: absolute; left: 14px; bottom: 12px; padding: 5px 10px; border-radius: 8px; background: rgb(26 26 26 / 0.78); color: var(--text-2, #a9a6a0); font-size: 12.5px; pointer-events: none; transition: opacity .3s; }

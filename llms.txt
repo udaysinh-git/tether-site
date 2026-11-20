@@ -13,5 +13,8 @@
 - [Home](https://tether.udaysinh.me/): features, setup and FAQ
 - [Guide](https://tether.udaysinh.me/guide/): how to let Claude Code or Codex use your real browser
 - [Tether vs Gemini in Chrome](https://tether.udaysinh.me/vs/gemini-in-chrome/): how the two differ
+- [Chrome Web Store](https://chromewebstore.google.com/detail/tether/bdkhlojbkkldeehiolelnmnpaanjdncc): the extension for Chrome, Brave and Edge
+- [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/tether/): the extension for Firefox and Zen
+- [npm package](https://www.npmjs.com/package/tether-browser): the local MCP host, `npm install -g tether-browser`
 - [Source code](https://github.com/udaysinh-git/tether): GitHub repository, MIT licence
 - [Community](https://discord.gg/UcB8z8u4JP): the KuroLabs Discord, where the #tether channel has ideas, feedback and early builds
